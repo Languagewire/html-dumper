@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./src/</directory>
+    </include>
+    <report>
+      <php outputFile="build/log/coverage/phpunit.cov"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="Static Page Generator Unit Test Suite">
+      <directory>./tests/unit</directory>
+    </testsuite>
+  </testsuites>
+  <logging/>
+</phpunit>

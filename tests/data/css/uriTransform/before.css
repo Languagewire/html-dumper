@@ -1,0 +1,11 @@
+.relative { background: url('data/img/relative.png') no-repeat; }
+.relative.param { background: url('data/img/relative.png?query=param') no-repeat; }
+
+.absolute { background: url('/data/img/absolute.png') no-repeat; }
+.absolute.param { background: url('/data/img/absolute.png?query=param') no-repeat; }
+
+.baseDomain { background: url('http://example.com/data/img/baseDomain.png') no-repeat; }
+.baseDomain.param { background: url('http://example.com/data/img/baseDomain.png?query=param') no-repeat; }
+
+.externalDomain { background: url('http://externalcontent.com/data/img/externalDomain.png') no-repeat; }
+.externalDomain.param { background: url('http://externalcontent.com/data/img/externalDomain.png?query=param') no-repeat; }

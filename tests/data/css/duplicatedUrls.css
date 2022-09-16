@@ -1,0 +1,9 @@
+p {
+    text-align: center;
+    background: url('data/img/image.png') no-repeat;
+}
+
+b {
+    color: red;
+    background: url('data/img/image.png') no-repeat;
+}
