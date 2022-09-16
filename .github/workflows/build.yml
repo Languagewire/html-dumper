@@ -32,6 +32,10 @@ jobs:
           coverage: "none"
           php-version: "${{ matrix.php-version }}"
 
+      - name: "Downgrade PHPUnit"
+        if: matrix.php-version == '7.2'
+        run: "composer require --dev phpunit/phpunit:^8.5.29 --update-with-dependencies"
+
       - name: "Install lowest dependencies"
         if: ${{ matrix.dependencies == 'lowest' }}
         run: "composer update --prefer-lowest --no-interaction --no-progress"
@@ -70,6 +74,10 @@ jobs:
           extensions: mbstring
           tools: composer:v2
 
+      - name: "Downgrade PHPUnit"
+        if: matrix.php-version == '7.2'
+        run: "composer require --dev phpunit/phpunit:^8.5.29 --update-with-dependencies"
+
       - name: "Install lowest dependencies"
         if: ${{ matrix.dependencies == 'lowest' }}
         run: "composer update --prefer-lowest --no-interaction --no-progress"
@@ -77,10 +85,6 @@ jobs:
       - name: "Install highest dependencies"
         if: ${{ matrix.dependencies == 'highest' }}
         run: "composer update --no-interaction --no-progress"
-
-      - name: "Downgrade PHPUnit and Mockery"
-        if: matrix.php-version == '7.2' || matrix.php-version == '7.3'
-        run: "composer require --dev phpunit/phpunit:^7.5.20 mockery/mockery:^1.3 --update-with-dependencies"
 
       - name: "Run PHPStan"
         run: "bin/phpstan analyse -c phpstan.neon"
