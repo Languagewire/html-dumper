@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace builder\LanguageWire;
 
-use Drupal\languagewire_tmgmt_connector\Adapter\PreviewSite\PreviewSiteBuild;
+use GuzzleHttp\Psr7\Response;
 use Prophecy\Prophet;
 use Psr\Http\Message\ResponseInterface;
 
-final class ResponseInterfaceBuilder
+final class ResponseBuilder
 {
     /**
      * @var string
@@ -29,7 +29,7 @@ final class ResponseInterfaceBuilder
      */
     private $statusCode = 200;
 
-    public function withBody(string $body): self
+    public function withBodyString(string $body): self
     {
         $this->body = $body;
         return $this;
@@ -43,13 +43,8 @@ final class ResponseInterfaceBuilder
 
     public function build(): ResponseInterface
     {
-        $prophet = new Prophet();
-        $response = $prophet->prophesize(ResponseInterface::class);
-        $stream = (new StreamInterfaceBuilder())->withBody($this->body)->build();
+        $response = new Response($this->statusCode, [], $this->body);
 
-        $response->getStatusCode()->willReturn($this->statusCode);
-        $response->getBody()->willReturn($stream);
-
-        return $response->reveal();
+        return $response;
     }
 }

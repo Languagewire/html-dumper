@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace unit\LanguageWire\Service;
 
-use builder\LanguageWire\ResponseInterfaceBuilder;
+use builder\LanguageWire\ResponseBuilder;
 use data\LanguageWire\CssFileProvider;
 use data\LanguageWire\HtmlFileProvider;
 use GuzzleHttp\ClientInterface;
@@ -275,7 +275,7 @@ class PageDownloaderTest extends TestCase
     private function httpClientWillReturnBasicHtmlPage(string $baseDomain): void
     {
         $htmlBody = (new HtmlFileProvider())->getValidHtmlWithAssets();
-        $response = (new ResponseInterfaceBuilder())->withBody($htmlBody)->build();
+        $response = (new ResponseBuilder())->withBodyString($htmlBody)->build();
         $this->httpClient->request('GET', $baseDomain)->willReturn($response);
     }
 
@@ -289,7 +289,7 @@ class PageDownloaderTest extends TestCase
     {
         $this->uriConverter->joinPaths($targetDirectory, '/index.html')->willReturn($targetDirectory . '/index.html');
 
-        $assetResponse = (new ResponseInterfaceBuilder())->build();
+        $assetResponse = (new ResponseBuilder())->build();
         foreach ($expectedAssetPaths as $expectedAssetUrl) {
             $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->willReturn($assetResponse);
         }

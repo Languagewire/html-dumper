@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace builder\LanguageWire;
 
-use Drupal\languagewire_tmgmt_connector\Adapter\PreviewSite\PreviewSiteBuild;
 use Prophecy\Prophet;
 use Psr\Http\Message\StreamInterface;
 
-final class StreamInterfaceBuilder
+final class StreamBuilder
 {
     /**
      * @var string
      */
     private $body = "";
 
-    public function withBody(string $body): self
+    public function withBodyString(string $body): self
     {
         $this->body = $body;
         return $this;
