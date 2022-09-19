@@ -35,7 +35,7 @@ class NullableHttpClient
      * @return ResponseInterface|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function nullableHttpRequest(string $method, string $assetUrl): ?ResponseInterface
+    public function request(string $method, string $assetUrl): ?ResponseInterface
     {
         try {
             return $this->client->request($method, $assetUrl);

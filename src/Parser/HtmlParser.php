@@ -30,10 +30,10 @@ class HtmlParser
     /**
      * @param string $htmlContent
      * @param string $baseDomain
-     * @return HtmlParseResult
+     * @return ParseResult
      * @throws HtmlParsingException
      */
-    public function parseHtmlContent(string $htmlContent, string $baseDomain): HtmlParseResult
+    public function parseHtmlContent(string $htmlContent, string $baseDomain): ParseResult
     {
         $document = new \DOMDocument();
         if (!@$document->loadHTML($htmlContent)) {
@@ -63,7 +63,7 @@ class HtmlParser
         $sanitizedAssetUrls = array_map('urldecode', $assetUrls);
         $uniqueAssetUrls = array_unique($sanitizedAssetUrls);
 
-        return new HtmlParseResult($outputHtml, $uniqueAssetUrls);
+        return new ParseResult($outputHtml, $uniqueAssetUrls);
     }
 
     private function deleteAnchorHrefs(\DOMXPath $xpath): void

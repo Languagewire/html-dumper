@@ -18,7 +18,7 @@ use GuzzleHttp\ClientInterface;
 use LanguageWire\HtmlDumper\Http\NullableHttpClient;
 use LanguageWire\HtmlDumper\Parser\CssParser;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
-use LanguageWire\HtmlDumper\Parser\HtmlParseResult;
+use LanguageWire\HtmlDumper\Parser\ParseResult;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use Psr\Http\Message\StreamInterface;
 
@@ -84,7 +84,7 @@ class PageDownloader
      * @param string $url
      * @param string $targetBaseDirectory
      * @param string $baseDomain
-     * @return HtmlParseResult|null
+     * @return ParseResult|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \LanguageWire\HtmlDumper\Parser\HtmlParsingException
      */
@@ -92,8 +92,8 @@ class PageDownloader
         string $url,
         string $targetBaseDirectory,
         string $baseDomain
-    ): ?HtmlParseResult {
-        $indexFileResponse = $this->httpClient->nullableHttpRequest("GET", $url);
+    ): ?ParseResult {
+        $indexFileResponse = $this->httpClient->request("GET", $url);
 
         if ($indexFileResponse == null) {
             return null;
@@ -101,7 +101,7 @@ class PageDownloader
 
         $result = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
 
-        $this->storeContent($result->getOutputHtml(), $targetBaseDirectory, '/index.html');
+        $this->storeContent($result->getOutputCode(), $targetBaseDirectory, '/index.html');
 
         return $result;
     }
@@ -206,7 +206,7 @@ class PageDownloader
      */
     private function downloadAsset(string $assetUrl, string $targetDirectory, string $baseDomain): ?string
     {
-        $assetResponse = $this->httpClient->nullableHttpRequest("GET", $assetUrl);
+        $assetResponse = $this->httpClient->request("GET", $assetUrl);
 
         if ($assetResponse == null) {
             // Do nothing, leave the broken URL for now

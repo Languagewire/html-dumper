@@ -20,9 +20,8 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ServerException;
 use LanguageWire\HtmlDumper\Parser\CssParser;
-use LanguageWire\HtmlDumper\Parser\CssParseResult;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
-use LanguageWire\HtmlDumper\Parser\HtmlParseResult;
+use LanguageWire\HtmlDumper\Parser\ParseResult;
 use LanguageWire\HtmlDumper\Service\PageDownloader;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
@@ -336,7 +335,7 @@ class PageDownloaderTest extends TestCase
     private function htmlParserReturnsResult(array $expectedAssetPaths, string $baseDomain): void
     {
         $htmlBody = (new HtmlFileProvider())->getValidHtmlWithAssets();
-        $parseResult = new HtmlParseResult($htmlBody, $expectedAssetPaths);
+        $parseResult = new ParseResult($htmlBody, $expectedAssetPaths);
         $this->htmlParser->parseHtmlContent(Argument::type("string"), $baseDomain)->willReturn($parseResult);
     }
 
@@ -348,7 +347,7 @@ class PageDownloaderTest extends TestCase
     private function cssParserReturnsResult(array $expectedAssetPaths, string $baseDomain): void
     {
         $cssBody = (new CssFileProvider())->getValidCssWithAssets();
-        $parseResult = new CssParseResult($cssBody, $expectedAssetPaths);
+        $parseResult = new ParseResult($cssBody, $expectedAssetPaths);
         $this->cssParser->parseCssContent(Argument::type("string"), $baseDomain, 2)->willReturn($parseResult);
     }
 }

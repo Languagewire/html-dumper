@@ -16,31 +16,31 @@ namespace LanguageWire\HtmlDumper\Parser;
 use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
 
-class CssParseResult
+class ParseResult
 {
     /**
      * @var string
      */
-    private $outputCss;
+    private $outputCode;
     /**
      * @var string[]
      */
     private $assetUris;
 
     /**
-     * @param string $outputCss
+     * @param string $outputCode
      * @param string[] $assetUris
      */
-    public function __construct(string $outputCss, array $assetUris)
+    public function __construct(string $outputCode, array $assetUris)
     {
-        $this->outputCss = $outputCss;
+        $this->outputCode = $outputCode;
         $this->assetUris = $assetUris;
     }
 
-    public function getOutputCss(): StreamInterface
+    public function getOutputCode(): StreamInterface
     {
         $handle = fopen('php://memory', "rw+");
-        fwrite($handle, $this->outputCss);
+        fwrite($handle, $this->outputCode);
         fseek($handle, 0);
         return new Stream($handle);
     }

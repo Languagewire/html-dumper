@@ -31,15 +31,15 @@ class CssParser
      * @param string $cssContent
      * @param string $baseDomain
      * @param int $depthLevel
-     * @return CssParseResult
+     * @return ParseResult
      */
-    public function parseCssContent(string $cssContent, string $baseDomain, int $depthLevel = 0): CssParseResult
+    public function parseCssContent(string $cssContent, string $baseDomain, int $depthLevel = 0): ParseResult
     {
         $assetUrls = $this->getUris($cssContent);
         $outputCss = $this->updateCss($cssContent, $assetUrls, $baseDomain, $depthLevel);
         $sanitizedAssetUrls = array_map('urldecode', $assetUrls);
 
-        return new CssParseResult($outputCss, $sanitizedAssetUrls);
+        return new ParseResult($outputCss, $sanitizedAssetUrls);
     }
 
     /**
