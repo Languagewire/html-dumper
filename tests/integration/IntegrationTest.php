@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace integration\LanguageWire;
 
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
@@ -28,11 +27,16 @@ class IntegrationTest extends TestCase
     use \Prophecy\PhpUnit\ProphecyTrait;
     use TemporaryFileTestsTrait;
 
-    private const TEMP_TARGET_DIRECTORY = "/app/tests/target";
+    private const TEMP_TARGET_DIRECTORY_NAME = "html-dumper-target";
+    /**
+     * @var string
+     */
+    private $tempTargetDirectory;
 
     protected function setUp(): void
     {
-        $baseTargetPath = dirname(self::TEMP_TARGET_DIRECTORY);
+        $this->tempTargetDirectory = sys_get_temp_dir() . '/' . self::TEMP_TARGET_DIRECTORY_NAME;
+        $baseTargetPath = dirname($this->tempTargetDirectory);
 
         if (!is_dir($baseTargetPath)) {
             mkdir($baseTargetPath);
@@ -41,8 +45,8 @@ class IntegrationTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (is_dir(self::TEMP_TARGET_DIRECTORY)) {
-            // $this->recursivelyDeleteDirectory("/app/tests/target");
+        if (is_dir($this->tempTargetDirectory)) {
+            $this->recursivelyDeleteDirectory($this->tempTargetDirectory);
         }
     }
 
@@ -52,7 +56,7 @@ class IntegrationTest extends TestCase
     public function PageDownloader__WHEN_downloading_external_url_THEN_files_are_created(): void
     {
         $baseDomain = "https://www.languagewire.com/en/about-us/locations";
-        $targetDirectory = self::TEMP_TARGET_DIRECTORY;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $pageDownloader = $this->pageDownloader();
 
