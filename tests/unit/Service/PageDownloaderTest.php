@@ -114,7 +114,7 @@ class PageDownloaderTest extends TestCase
     /**
      * @test
      */
-    public function downloadPage__WHEN_an_page_has_css_assets_THEN_assets_within_it_are_downloaded(): void
+    public function downloadPage__WHEN_page_has_css_assets_THEN_assets_within_it_are_downloaded(): void
     {
         $baseDomain = self::BASE_DOMAIN;
         $targetDirectory = $this->tempTargetDirectory;
@@ -246,6 +246,9 @@ class PageDownloaderTest extends TestCase
         $url = self::BASE_DOMAIN;
         $targetDirectory = $this->tempTargetDirectory;
 
+        // In setUp() we create the parent of $targetDirectory.
+        // Now we are manually creating $targetDirectory, which is normally created by PageDownloader.
+        // This will cause the `download()` method to throw an exception.
         mkdir($targetDirectory);
 
         $pageDownloader = $this->pageDownloader();
@@ -296,9 +299,8 @@ class PageDownloaderTest extends TestCase
     {
         $this->uriConverter->joinPaths($targetDirectory, '/index.html')->willReturn($targetDirectory . '/index.html');
 
-        $assetResponse = (new ResponseBuilder())->build();
         foreach ($expectedAssetPaths as $expectedAssetUrl) {
-            $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->willReturn($assetResponse);
+            $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->willReturn((new ResponseBuilder())->build());
         }
     }
 
