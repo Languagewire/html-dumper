@@ -52,7 +52,6 @@ jobs:
       matrix:
         php-version:
           - "7.4"
-          - "8.0"
           - "8.1"
 
     steps:
@@ -77,3 +76,9 @@ jobs:
 
       - name: "Run PHPStan"
         run: "bin/phpstan analyse -c phpstan.neon"
+
+      - name: "Run PHPCS on src"
+        run: "bin/phpcs --standard=PSR12 src/"
+
+      - name: "Run PHPCS on tests"
+        run: "bin/phpcs --standard=phpcs.xml tests/"
