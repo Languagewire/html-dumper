@@ -44,7 +44,7 @@ jobs:
         run: "bin/phpunit --testdox tests/unit/"
 
   static-analysis:
-    name: "PHPStan"
+    name: "Static analysis (phpstan, phpcs)"
     runs-on: "ubuntu-latest"
 
     strategy:
@@ -52,11 +52,7 @@ jobs:
       matrix:
         php-version:
           - "7.4"
-          - "8.0"
           - "8.1"
-        dependencies:
-          - "lowest"
-          - "highest"
 
     steps:
       - name: "Checkout"
@@ -70,13 +66,14 @@ jobs:
           extensions: mbstring
           tools: composer:v2
 
-      - name: "Install lowest dependencies"
-        if: ${{ matrix.dependencies == 'lowest' }}
-        run: "composer update --prefer-lowest --no-interaction --no-progress"
-
       - name: "Install highest dependencies"
-        if: ${{ matrix.dependencies == 'highest' }}
         run: "composer update --no-interaction --no-progress"
 
       - name: "Run PHPStan"
         run: "bin/phpstan analyse -c phpstan.neon"
+
+      - name: "Run PHPCS on src"
+        run: "bin/phpcs --standard=PSR12 src/"
+
+      - name: "Run PHPCS on tests"
+        run: "bin/phpcs --standard=phpcs.xml tests/"

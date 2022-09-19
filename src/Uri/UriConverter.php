@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -39,7 +41,7 @@ class UriConverter
      */
     public function convertUriToOfflinePath(string $assetUri, string $baseDomain): string
     {
-        if (filter_var($assetUri, FILTER_VALIDATE_URL) !== FALSE) {
+        if (filter_var($assetUri, FILTER_VALIDATE_URL) !== false) {
             $baseHost = parse_url($baseDomain, PHP_URL_HOST);
             $host = parse_url($assetUri, PHP_URL_HOST);
             $prefix = "";
@@ -64,10 +66,10 @@ class UriConverter
      */
     public function convertUriToUrl(string $assetUri, string $baseDomain): string
     {
-        if (filter_var($assetUri, FILTER_VALIDATE_URL) !== FALSE) {
+        if (filter_var($assetUri, FILTER_VALIDATE_URL) !== false) {
             return $assetUri;
         } else {
-            $assetUri = str_replace("../","", $assetUri);
+            $assetUri = str_replace("../", "", $assetUri);
             return $this->joinUrlWithPath($baseDomain, $assetUri);
         }
     }
@@ -119,8 +121,12 @@ class UriConverter
      */
     public function joinPaths(string $path1, string $path2): string
     {
-        if (empty($path1)) return $path2;
-        if (empty($path2)) return $path1;
+        if (empty($path1)) {
+            return $path2;
+        }
+        if (empty($path2)) {
+            return $path1;
+        }
 
         $path1 = rtrim($path1, '/');
         $path2 = ltrim($path2, '/');

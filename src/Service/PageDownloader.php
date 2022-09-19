@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -39,8 +41,12 @@ class PageDownloader
      */
     private $cssParser;
 
-    public function __construct(ClientInterface $httpClient = null, UriConverter $uriConverter = null, HtmlParser $htmlParser = null, CssParser $cssParser = null)
-    {
+    public function __construct(
+        ClientInterface $httpClient = null,
+        UriConverter $uriConverter = null,
+        HtmlParser $htmlParser = null,
+        CssParser $cssParser = null
+    ) {
         $this->httpClient = new NullableHttpClient($httpClient ?? new Client());
         $this->uriConverter = $uriConverter ?? new UriConverter();
         $this->htmlParser = $htmlParser ?? new HtmlParser($this->uriConverter);
@@ -82,8 +88,11 @@ class PageDownloader
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \LanguageWire\HtmlDumper\Parser\HtmlParsingException
      */
-    private function getProcessedIndexFile(string $url, string $targetBaseDirectory, string $baseDomain): ?HtmlParseResult
-    {
+    private function getProcessedIndexFile(
+        string $url,
+        string $targetBaseDirectory,
+        string $baseDomain
+    ): ?HtmlParseResult {
         $indexFileResponse = $this->httpClient->nullableHttpRequest("GET", $url);
 
         if ($indexFileResponse == null) {
@@ -105,8 +114,11 @@ class PageDownloader
      * @param string $relativeTargetPath
      * @return string
      */
-    private function storeContent(StreamInterface $contentStream, string $targetBaseDirectory, string $relativeTargetPath): string
-    {
+    private function storeContent(
+        StreamInterface $contentStream,
+        string $targetBaseDirectory,
+        string $relativeTargetPath
+    ): string {
         $relativeTargetPath = $this->uriConverter->cleanRelativePath($relativeTargetPath);
         $targetPath = $this->uriConverter->joinPaths($targetBaseDirectory, $relativeTargetPath);
 

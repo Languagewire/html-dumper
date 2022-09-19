@@ -9,8 +9,6 @@ export $(grep -v '^#' .env | xargs)
 (cd .. && docker build \
 --build-arg LIBRARY_RELEASE_NAME=$LIBRARY_RELEASE_NAME \
 --build-arg RUN_INTEGRATION_TESTS=$RUN_INTEGRATION_TESTS \
---build-arg AZURE_DEVOPS_EXT_PAT=$AZURE_DEVOPS_EXT_PAT \
---build-arg DO_PUBLISH=$DO_PUBLISH \
 -t "$PROJECT_NAME" -f build/Dockerfile .)
 
 # Run a container to download artifacts

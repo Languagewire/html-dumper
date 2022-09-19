@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -82,7 +84,7 @@ class CssParser
             }
 
             $re = '/url\s*\(\s*[\'"]?' . preg_quote($assetUrl, '/') . '[\'"]?\s*\)/im';
-            
+
             $cssContent = preg_replace($re, sprintf("url('%s')", $relativePath), $cssContent);
         }
 

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -13,5 +15,4 @@ namespace LanguageWire\HtmlDumper\Parser;
 
 class HtmlParsingException extends \Exception
 {
-
 }
