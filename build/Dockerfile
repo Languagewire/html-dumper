@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------
 # Install composer dependencies
 
-FROM php:7.4.30-cli as base
+FROM php:8.1.10-cli as base
 RUN apt-get update && apt-get install -y \
   zip \
   && rm -rf /var/lib/apt/lists/*
