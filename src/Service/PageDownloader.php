@@ -187,7 +187,7 @@ class PageDownloader
                 $parseResult = $this->cssParser->parseCssContent($contents, $baseDomain, $depthLevel);
 
                 // Store updated CSS
-                file_put_contents($targetPath, $parseResult->getOutputCss());
+                file_put_contents($targetPath, $parseResult->getOutputCode());
 
                 // Recursively call `downloadAssets` with the assetPaths found within the css file
                 $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);

@@ -78,7 +78,7 @@ class CssParserTest extends TestCase
         $beforeCssContent = (new CssFileProvider())->getTestCssFilesUriTransformBefore();
         $expectedOutputCss = (new CssFileProvider())->getTestCssFilesUriTransformAfter();
 
-        $outputCss = $parser->parseCssContent($beforeCssContent, 'http://example.com')->getOutputCss();
+        $outputCss = $parser->parseCssContent($beforeCssContent, 'http://example.com')->getOutputCode();
 
         $this->assertEquals(
             $expectedOutputCss,

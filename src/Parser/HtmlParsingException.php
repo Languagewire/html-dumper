@@ -15,4 +15,22 @@ namespace LanguageWire\HtmlDumper\Parser;
 
 class HtmlParsingException extends \Exception
 {
+    /**
+     * @var string
+     */
+    private $htmlContent;
+
+    public function __construct(string $htmlContent)
+    {
+        parent::__construct("Could not load HTML content");
+        $this->htmlContent = $htmlContent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHtmlContent(): string
+    {
+        return $this->htmlContent;
+    }
 }

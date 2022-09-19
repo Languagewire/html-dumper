@@ -32,12 +32,13 @@ class HtmlParser
      * @param string $baseDomain
      * @return ParseResult
      * @throws HtmlParsingException
+     * @throws HtmlGenerationException
      */
     public function parseHtmlContent(string $htmlContent, string $baseDomain): ParseResult
     {
         $document = new \DOMDocument();
-        if (!@$document->loadHTML($htmlContent)) {
-            throw new HtmlParsingException("Could not load HTML content");
+        if (@$document->loadHTML($htmlContent) === false) {
+            throw new HtmlParsingException($htmlContent);
         }
 
         $xpath = new \DOMXPath($document);
@@ -57,7 +58,7 @@ class HtmlParser
         $outputHtml = $document->saveHTML();
 
         if ($outputHtml === false) {
-            throw new HtmlParsingException("Could not generate updated HTML output");
+            throw new HtmlGenerationException();
         }
 
         $sanitizedAssetUrls = array_map('urldecode', $assetUrls);

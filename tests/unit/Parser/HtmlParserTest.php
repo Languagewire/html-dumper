@@ -15,6 +15,7 @@ namespace unit\LanguageWire\Parser;
 
 use data\LanguageWire\HtmlFileProvider;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
+use LanguageWire\HtmlDumper\Parser\HtmlParsingException;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -125,6 +126,19 @@ class HtmlParserTest extends TestCase
             $this->removeLineBreaks((string) $outputHtml)
         );
     }
+
+    /**
+     * @todo create an input that throws this exception. does it exist?
+     * @test
+     */
+    /*public function parseHtmlContent__WHEN_invalid_html_is_provided_THEN_HtmlParsingException_is_thrown(): void {
+
+        $this->expectException(HtmlParsingException::class);
+
+        $htmlContent = "<phtnl><p><htpml></htpml></p></p><html><body><head><title>asd</title></head></body></html>";
+        $parser = $this->parser();
+        $parser->parseHtmlContent($htmlContent, 'http://example.com');
+    }*/
 
     public function provideHtmlFiles(): array
     {
