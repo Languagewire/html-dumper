@@ -5,7 +5,7 @@ LanguageWire HtmlDumper library
 ![Coverage 95.90%](https://img.shields.io/badge/coverage-95.90%25-brightgreen)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-HtmlDumper is a PHP library which downloads a copy of an HTML page and its assets into a target directory. It is used at LanguageWire to create static versions of documents used as translation contexts.
+HtmlDumper is a PHP library which downloads a copy of an HTML page and its assets into a target directory.
 
 - Downloads HTML source code and transforms all URIs into relative paths, creating an updated `index.html` file.
 - Parses HTML and fetches relevant resources
@@ -15,7 +15,7 @@ HtmlDumper is a PHP library which downloads a copy of an HTML page and its asset
 - Does not crawl beyond the initial URL.
 
 ```php
-$url = "https://www.languagewire.com/en/about-us/locations";
+$url = "https://example.com";
 $targetDirectory = "/tmp/htmldump";
 
 $downloader = new \LanguageWire\HtmlDumper\Service\PageDownloader();
@@ -27,6 +27,7 @@ if ($downloader->download($url, $targetDirectory)) {
 ## Requirements
 
 * PHP 7.2+
+* [PHP DOM Extension](https://www.php.net/manual/en/intro.dom.php)
 * [Composer](https://getcomposer.org/)
 
 ## Installation
@@ -34,9 +35,8 @@ if ($downloader->download($url, $targetDirectory)) {
 The recommended way to install HtmlDumper is through [Composer](https://getcomposer.org/).
 
 ```bash
-composer require languagewire/htmldumper
+composer require languagewire/html-dumper
 ```
-
 
 ## Development
 

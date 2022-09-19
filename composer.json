@@ -1,6 +1,6 @@
 {
-  "name": "languagewire/htmldumper",
-  "description": "A library which downloads pages as static HTML files and assets",
+  "name": "languagewire/html-dumper",
+  "description": "A library which downloads pages as static HTML files and assets and dumps them on disk",
   "type": "library",
   "version": "0.0.0",
   "require": {

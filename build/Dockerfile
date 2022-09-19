@@ -52,4 +52,4 @@ RUN bin/phpcs --standard=phpcs-psr12-tests.xml tests/
 RUN rm -rf ./bin ./vendor ./build ./environment ./vsts .phpunit.result.cache composer.lock
 
 WORKDIR /publish
-RUN cd /app && zip -r /publish/htmldumper-$LIBRARY_RELEASE_NAME.zip .
+RUN cd /app && zip -r /publish/html-dumper-$LIBRARY_RELEASE_NAME.zip .
