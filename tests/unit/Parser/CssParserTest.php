@@ -23,6 +23,8 @@ class CssParserTest extends TestCase
 {
     use \Prophecy\PhpUnit\ProphecyTrait;
 
+    private const BASE_DOMAIN = 'http://example.com';
+
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
@@ -40,11 +42,11 @@ class CssParserTest extends TestCase
      */
     public function parseCssContent__WHEN_valid_css_is_provided_THEN_expected_results_are_returned(string $cssContent, array $expectedAssetUrls): void
     {
-        $this->uriConverter->convertUriToOfflinePath(Argument::type('string'), 'http://example.com')->willReturnArgument(0);
+        $this->uriConverter->convertUriToOfflinePath(Argument::type('string'), self::BASE_DOMAIN)->willReturnArgument(0);
         $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
         $parser = $this->parser();
-        $assetUrls = $parser->parseCssContent($cssContent, 'http://example.com')->getAssetUris();
+        $assetUrls = $parser->parseCssContent($cssContent, self::BASE_DOMAIN)->getAssetUris();
         $this->assertEqualsCanonicalizing($expectedAssetUrls, $assetUrls);
     }
 
@@ -53,23 +55,23 @@ class CssParserTest extends TestCase
      */
     public function parseCssContent__WHEN_valid_css_is_provided_with_different_uri_schemes_THEN_output_css_is_converted(): void
     {
-        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png', 'http://example.com')->willReturn('data/img/relative.png');
-        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png?query=param', 'http://example.com')->willReturn('data/img/relative.png?query=param');
+        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png', self::BASE_DOMAIN)->willReturn('data/img/relative.png');
+        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/relative.png?query=param');
         $this->uriConverter->removeQueryParams('data/img/relative.png')->willReturn('data/img/relative.png');
         $this->uriConverter->removeQueryParams('data/img/relative.png?query=param')->willReturn('data/img/relative.png');
 
-        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png', 'http://example.com')->willReturn('data/img/absolute.png');
-        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png?query=param', 'http://example.com')->willReturn('data/img/absolute.png?query=param');
+        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png', self::BASE_DOMAIN)->willReturn('data/img/absolute.png');
+        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/absolute.png?query=param');
         $this->uriConverter->removeQueryParams('data/img/absolute.png')->willReturn('data/img/absolute.png');
         $this->uriConverter->removeQueryParams('data/img/absolute.png?query=param')->willReturn('data/img/absolute.png');
 
-        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png', 'http://example.com')->willReturn('data/img/baseDomain.png');
-        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png?query=param', 'http://example.com')->willReturn('data/img/baseDomain.png?query=param');
+        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png', self::BASE_DOMAIN)->willReturn('data/img/baseDomain.png');
+        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/baseDomain.png?query=param');
         $this->uriConverter->removeQueryParams('data/img/baseDomain.png')->willReturn('data/img/baseDomain.png');
         $this->uriConverter->removeQueryParams('data/img/baseDomain.png?query=param')->willReturn('data/img/baseDomain.png');
 
-        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png', 'http://example.com')->willReturn('externalcontent.com/data/img/externalDomain.png');
-        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png?query=param', 'http://example.com')->willReturn('externalcontent.com/data/img/externalDomain.png?query=param');
+        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png', self::BASE_DOMAIN)->willReturn('externalcontent.com/data/img/externalDomain.png');
+        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png?query=param', self::BASE_DOMAIN)->willReturn('externalcontent.com/data/img/externalDomain.png?query=param');
         $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png')->willReturn('externalcontent.com/data/img/externalDomain.png');
         $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png?query=param')->willReturn('externalcontent.com/data/img/externalDomain.png');
 
@@ -78,7 +80,7 @@ class CssParserTest extends TestCase
         $beforeCssContent = (new CssFileProvider())->getTestCssFilesUriTransformBefore();
         $expectedOutputCss = (new CssFileProvider())->getTestCssFilesUriTransformAfter();
 
-        $outputCss = $parser->parseCssContent($beforeCssContent, 'http://example.com')->getOutputCode();
+        $outputCss = $parser->parseCssContent($beforeCssContent, self::BASE_DOMAIN)->getOutputCode();
 
         $this->assertEquals(
             $expectedOutputCss,
