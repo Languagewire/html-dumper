@@ -35,6 +35,9 @@ class PageDownloaderTest extends TestCase
     use \Prophecy\PhpUnit\ProphecyTrait;
     use TemporaryFileTestsTrait;
 
+    private const TEMP_TARGET_DIRECTORY_NAME = "page-downloader-target";
+    private const BASE_DOMAIN = "https://example.com";
+
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
@@ -51,6 +54,10 @@ class PageDownloaderTest extends TestCase
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     private $cssParser;
+    /**
+     * @var string
+     */
+    private $tempTargetDirectory;
 
     protected function setUp(): void
     {
@@ -58,19 +65,19 @@ class PageDownloaderTest extends TestCase
 
         $this->uriConverter = $this->prophesize(UriConverter::class);
 
-        $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn('https://example.com');
+        $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn(self::BASE_DOMAIN);
         $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
         $this->htmlParser = $this->prophesize(HtmlParser::class);
         $this->cssParser = $this->prophesize(CssParser::class);
 
-        $this->createTemporaryDirectory("/tmp/target");
+        $this->tempTargetDirectory = $this->createTemporaryDirectory(self::TEMP_TARGET_DIRECTORY_NAME);
     }
 
     protected function tearDown(): void
     {
-        if (is_dir("/tmp/target")) {
-            $this->recursivelyDeleteDirectory("/tmp/target");
+        if (is_dir($this->tempTargetDirectory)) {
+            $this->recursivelyDeleteDirectory($this->tempTargetDirectory);
         }
     }
 
@@ -79,8 +86,8 @@ class PageDownloaderTest extends TestCase
      */
     public function downloadPage__WHEN_an_url_and_target_directory_are_provided_THEN_files_are_created(): void
     {
-        $baseDomain = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $expectedAssetPaths = [
             '/data/img/screenshot1.png',
@@ -109,8 +116,8 @@ class PageDownloaderTest extends TestCase
      */
     public function downloadPage__WHEN_an_page_has_css_assets_THEN_assets_within_it_are_downloaded(): void
     {
-        $baseDomain = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $expectedAssetPaths = [
             '/data/css/style.css',
@@ -153,8 +160,8 @@ class PageDownloaderTest extends TestCase
      */
     public function downloadPage__WHEN_some_assets_dont_have_file_extensions_THEN_those_files_are_not_created(): void
     {
-        $baseDomain = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $expectedValidAssetPaths = [
             '/data/img/screenshot1.png',
@@ -194,8 +201,8 @@ class PageDownloaderTest extends TestCase
      */
     public function downloadPage__WHEN_some_assets_throw_exceptions_THEN_those_files_are_not_created(): void
     {
-        $baseDomain = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $expectedExistingAssetPaths = [
             '/data/img/screenshot1.png',
@@ -236,8 +243,8 @@ class PageDownloaderTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $url = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $url = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         mkdir($targetDirectory);
 
@@ -252,8 +259,8 @@ class PageDownloaderTest extends TestCase
      */
     public function downloadPage__WHEN_client_returns_null_THEN_false_is_returned(): void
     {
-        $url = "https://example.com";
-        $targetDirectory = "/tmp/target";
+        $url = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
 
         $this->httpClientWillThrowExceptionOnUrl($url);
         $pageDownloader = $this->pageDownloader();

@@ -35,12 +35,7 @@ class IntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tempTargetDirectory = sys_get_temp_dir() . '/' . self::TEMP_TARGET_DIRECTORY_NAME;
-        $baseTargetPath = dirname($this->tempTargetDirectory);
-
-        if (!is_dir($baseTargetPath)) {
-            mkdir($baseTargetPath);
-        }
+        $this->tempTargetDirectory = $this->createTemporaryDirectory(self::TEMP_TARGET_DIRECTORY_NAME);
     }
 
     protected function tearDown(): void

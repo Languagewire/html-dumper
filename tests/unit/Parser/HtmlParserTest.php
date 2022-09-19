@@ -131,9 +131,8 @@ class HtmlParserTest extends TestCase
 
     /**
      * @todo create an input that throws this exception. does it exist?
-     * @test
-     */
-    /*public function parseHtmlContent__WHEN_invalid_html_is_provided_THEN_HtmlParsingException_is_thrown(): void {
+
+     public function parseHtmlContent__WHEN_invalid_html_is_provided_THEN_HtmlParsingException_is_thrown(): void {
 
         $this->expectException(HtmlParsingException::class);
 

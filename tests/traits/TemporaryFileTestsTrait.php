@@ -18,13 +18,16 @@ use RecursiveIteratorIterator;
 
 trait TemporaryFileTestsTrait
 {
-    protected function createTemporaryDirectory(string $targetPath): void
+    protected function createTemporaryDirectory(string $directoryName): string
     {
-        $baseTargetPath = dirname($targetPath);
+        $temporaryDirectoryNamePath = sys_get_temp_dir() . '/' . $directoryName;
+        $baseTargetPath = dirname($temporaryDirectoryNamePath);
 
         if (!is_dir($baseTargetPath)) {
             mkdir($baseTargetPath);
         }
+
+        return $temporaryDirectoryNamePath;
     }
 
     protected function recursivelyDeleteDirectory(string $directoryPath): void
