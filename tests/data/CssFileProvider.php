@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace data\LanguageWire;
 
-use PHPUnit\TextUI\TestFileNotFoundException;
-
-class CssFileProvider
+class CssFileProvider extends FileProviderBase
 {
     /**
      * @var array[]
@@ -51,34 +49,16 @@ class CssFileProvider
 
     public function getValidCssWithAssets(): string
     {
-        return file_get_contents("tests/data/css/oneUrl.css");
+        return $this->readFile("tests/data/css/oneUrl.css");
     }
 
     public function getTestCssFilesUriTransformBefore(): string
     {
-        return file_get_contents("tests/data/css/uriTransform/before.css");
+        return $this->readFile("tests/data/css/uriTransform/before.css");
     }
 
     public function getTestCssFilesUriTransformAfter(): string
     {
-        return file_get_contents("tests/data/css/uriTransform/after.css");
-    }
-
-    private function mapToPHPUnitProviderFormat(array $data): array
-    {
-        $result = [];
-
-        foreach ($data as $key => $value) {
-            $fileContents = file_get_contents($value[0]);
-            if ($fileContents === false) {
-                throw new TestFileNotFoundException($value[0]);
-            }
-            $result[$key] = [
-                file_get_contents($value[0]),
-                $value[1]
-            ];
-        }
-
-        return $result;
+        return $this->readFile("tests/data/css/uriTransform/after.css");
     }
 }

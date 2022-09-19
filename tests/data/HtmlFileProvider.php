@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace data\LanguageWire;
 
-class HtmlFileProvider
+class HtmlFileProvider extends FileProviderBase
 {
     /**
      * @var array[]
@@ -120,57 +120,38 @@ class HtmlFileProvider
         return array_merge($this->testHtmlFilesWithoutAssets, $this->testHtmlFilesWithAssets);
     }
 
-    public function getMinimalValidHtml(): string
-    {
-        return file_get_contents("tests/data/html/singleElement/minimal.html");
-    }
-
     public function getValidHtmlWithAssets(): string
     {
-        return file_get_contents("tests/data/html/singleElement/withMultipleImages.html");
+        return $this->readFile("tests/data/html/singleElement/withMultipleImages.html");
     }
 
     public function getTestHtmlFilesUriTransformBefore(): string
     {
-        return file_get_contents("tests/data/html/urlHandling/uriTransform/before.html");
+        return $this->readFile("tests/data/html/urlHandling/uriTransform/before.html");
     }
 
     public function getTestHtmlFilesUriTransformAfter(): string
     {
-        return file_get_contents("tests/data/html/urlHandling/uriTransform/after.html");
+        return $this->readFile("tests/data/html/urlHandling/uriTransform/after.html");
     }
 
     public function getTestHtmlFilesAnchorBefore(): string
     {
-        return file_get_contents("tests/data/html/removeAnchors/before.html");
+        return $this->readFile("tests/data/html/removeAnchors/before.html");
     }
 
     public function getTestHtmlFilesAnchorAfter(): string
     {
-        return file_get_contents("tests/data/html/removeAnchors/after.html");
+        return $this->readFile("tests/data/html/removeAnchors/after.html");
     }
 
     public function getTestHtmlFilesSrcSetsBefore(): string
     {
-        return file_get_contents("tests/data/html/removeSrcSets/before.html");
+        return $this->readFile("tests/data/html/removeSrcSets/before.html");
     }
 
     public function getTestHtmlFilesSrcSetsAfter(): string
     {
-        return file_get_contents("tests/data/html/removeSrcSets/after.html");
-    }
-
-    private function mapToPHPUnitProviderFormat(array $data): array
-    {
-        $result = [];
-
-        foreach ($data as $key => $value) {
-            $result[$key] = [
-                file_get_contents($value[0]),
-                $value[1]
-            ];
-        }
-
-        return $result;
+        return $this->readFile("tests/data/html/removeSrcSets/after.html");
     }
 }
