@@ -2,7 +2,7 @@ LanguageWire HtmlDumper library
 =====================================
 ![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-blue)
 ![Tests passing](https://img.shields.io/badge/tests-passing-brightgreen)
-![Coverage 97.93%](https://img.shields.io/badge/coverage-97.93%25-brightgreen)
+![Coverage 97.95%](https://img.shields.io/badge/coverage-97.95%25-brightgreen)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
 HtmlDumper is a PHP library which downloads a copy of an HTML page and its assets into a target directory. It is used at LanguageWire to create static versions of documents used as translation contexts.

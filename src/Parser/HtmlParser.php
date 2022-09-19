@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -185,8 +187,8 @@ class HtmlParser
 
         foreach ($xpath->query('//meta') as $meta) {
             $isMetaMediaTag = (
-                in_array($meta->getAttribute('property'), $tags, TRUE)
-                || in_array($meta->getAttribute('name'), $tags, TRUE)
+                in_array($meta->getAttribute('property'), $tags, true)
+                || in_array($meta->getAttribute('name'), $tags, true)
             );
 
             if ($isMetaMediaTag && $meta->hasAttribute('content')) {
@@ -221,8 +223,11 @@ class HtmlParser
      * @param string $baseDomain
      * @return string
      */
-    private function getOriginalAttributeAndConvertToRelativePath(\DOMElement $element, string $attributeName, string $baseDomain): string
-    {
+    private function getOriginalAttributeAndConvertToRelativePath(
+        \DOMElement $element,
+        string $attributeName,
+        string $baseDomain
+    ): string {
         $originalAttributeValue = $element->getAttribute($attributeName);
         $relativePath = $this->uriConverter->convertUriToOfflinePath($originalAttributeValue, $baseDomain);
         $relativePath = $this->uriConverter->cleanRelativePath($relativePath);

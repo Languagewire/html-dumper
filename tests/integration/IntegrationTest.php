@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -26,7 +28,7 @@ class IntegrationTest extends TestCase
     use \Prophecy\PhpUnit\ProphecyTrait;
     use TemporaryFileTestsTrait;
 
-    const TEMP_TARGET_DIRECTORY = "/app/tests/target";
+    private const TEMP_TARGET_DIRECTORY = "/app/tests/target";
 
     protected function setUp(): void
     {

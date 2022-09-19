@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the LanguageWire HtmlDumper library.
  *
@@ -35,8 +37,10 @@ class HtmlParserTest extends TestCase
      * @test
      * @dataProvider provideHtmlFiles
      */
-    public function parseHtmlContent__WHEN_valid_html_is_provided_THEN_expected_results_are_returned(string $htmlContent, array $expectedAssetUrls): void
-    {
+    public function parseHtmlContent__WHEN_valid_html_is_provided_THEN_expected_results_are_returned(
+        string $htmlContent,
+        array $expectedAssetUrls
+    ): void {
         $this->uriConverter->convertUriToOfflinePath(Argument::type('string'), 'http://example.com')->willReturnArgument(0);
         $this->uriConverter->cleanRelativePath(Argument::type('string'))->willReturnArgument(0);
 
