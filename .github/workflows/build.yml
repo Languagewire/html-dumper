@@ -73,7 +73,7 @@ jobs:
         run: "bin/phpstan analyse -c phpstan.neon"
 
       - name: "Run PHPCS on src"
-        run: "bin/phpcs --standard=PSR12 src/"
+        run: "bin/phpcs --standard=phpcs-psr12-strict.xml src/"
 
       - name: "Run PHPCS on tests"
-        run: "bin/phpcs --standard=phpcs.xml tests/"
+        run: "bin/phpcs --standard=phpcs-psr12-tests.xml tests/"
