@@ -54,9 +54,6 @@ jobs:
           - "7.4"
           - "8.0"
           - "8.1"
-        dependencies:
-          - "lowest"
-          - "highest"
 
     steps:
       - name: "Checkout"
