@@ -43,8 +43,6 @@ final class ResponseBuilder
 
     public function build(): ResponseInterface
     {
-        $response = new Response($this->statusCode, [], $this->body);
-
-        return $response;
+        return new Response($this->statusCode, [], $this->body);
     }
 }
