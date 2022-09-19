@@ -43,7 +43,7 @@ class HtmlParserTest extends TestCase
         array $expectedAssetUrls
     ): void {
         $this->uriConverter->convertUriToOfflinePath(Argument::type('string'), 'http://example.com')->willReturnArgument(0);
-        $this->uriConverter->cleanRelativePath(Argument::type('string'))->willReturnArgument(0);
+        $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
         $parser = $this->parser();
         $assetUrls = $parser->parseHtmlContent($htmlContent, 'http://example.com')->getAssetUris();
@@ -57,23 +57,23 @@ class HtmlParserTest extends TestCase
     {
         $this->uriConverter->convertUriToOfflinePath('data/img/relative.png', 'http://example.com')->willReturn('data/img/relative.png');
         $this->uriConverter->convertUriToOfflinePath('data/img/relative.png?query=param', 'http://example.com')->willReturn('data/img/relative.png?query=param');
-        $this->uriConverter->cleanRelativePath('data/img/relative.png')->willReturn('data/img/relative.png');
-        $this->uriConverter->cleanRelativePath('data/img/relative.png?query=param')->willReturn('data/img/relative.png');
+        $this->uriConverter->removeQueryParams('data/img/relative.png')->willReturn('data/img/relative.png');
+        $this->uriConverter->removeQueryParams('data/img/relative.png?query=param')->willReturn('data/img/relative.png');
 
         $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png', 'http://example.com')->willReturn('data/img/absolute.png');
         $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png?query=param', 'http://example.com')->willReturn('data/img/absolute.png?query=param');
-        $this->uriConverter->cleanRelativePath('data/img/absolute.png')->willReturn('data/img/absolute.png');
-        $this->uriConverter->cleanRelativePath('data/img/absolute.png?query=param')->willReturn('data/img/absolute.png');
+        $this->uriConverter->removeQueryParams('data/img/absolute.png')->willReturn('data/img/absolute.png');
+        $this->uriConverter->removeQueryParams('data/img/absolute.png?query=param')->willReturn('data/img/absolute.png');
 
         $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png', 'http://example.com')->willReturn('data/img/baseDomain.png');
         $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png?query=param', 'http://example.com')->willReturn('data/img/baseDomain.png?query=param');
-        $this->uriConverter->cleanRelativePath('data/img/baseDomain.png')->willReturn('data/img/baseDomain.png');
-        $this->uriConverter->cleanRelativePath('data/img/baseDomain.png?query=param')->willReturn('data/img/baseDomain.png');
+        $this->uriConverter->removeQueryParams('data/img/baseDomain.png')->willReturn('data/img/baseDomain.png');
+        $this->uriConverter->removeQueryParams('data/img/baseDomain.png?query=param')->willReturn('data/img/baseDomain.png');
 
         $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png', 'http://example.com')->willReturn('externalcontent.com/data/img/externalDomain.png');
         $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png?query=param', 'http://example.com')->willReturn('externalcontent.com/data/img/externalDomain.png?query=param');
-        $this->uriConverter->cleanRelativePath('externalcontent.com/data/img/externalDomain.png')->willReturn('externalcontent.com/data/img/externalDomain.png');
-        $this->uriConverter->cleanRelativePath('externalcontent.com/data/img/externalDomain.png?query=param')->willReturn('externalcontent.com/data/img/externalDomain.png');
+        $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png')->willReturn('externalcontent.com/data/img/externalDomain.png');
+        $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png?query=param')->willReturn('externalcontent.com/data/img/externalDomain.png');
 
         $parser = $this->parser();
 
@@ -112,7 +112,7 @@ class HtmlParserTest extends TestCase
     public function parseHtmlContent__WHEN_html_has_srcsets_THEN_their_attributes_are_removed(): void
     {
         $this->uriConverter->convertUriToOfflinePath('data/img/screenshot.png', 'http://example.com')->willReturn('data/img/screenshot.png');
-        $this->uriConverter->cleanRelativePath('data/img/screenshot.png')->willReturn('data/img/screenshot.png');
+        $this->uriConverter->removeQueryParams('data/img/screenshot.png')->willReturn('data/img/screenshot.png');
 
         $parser = $this->parser();
 

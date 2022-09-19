@@ -78,12 +78,12 @@ class UriConverterTest extends TestCase
     /**
      * @test
      */
-    public function cleanRelativePath__WHEN_a_path_has_extra_parts_THEN_they_are_removed(): void
+    public function removeQueryParams__WHEN_a_path_has_extra_parts_THEN_they_are_removed(): void
     {
         $converter = new UriConverter();
 
-        $this->assertEquals("file.png", $converter->cleanRelativePath("file.png#hash"));
-        $this->assertEquals("file.png", $converter->cleanRelativePath("file.png?query=param"));
+        $this->assertEquals("file.png", $converter->removeQueryParams("file.png#hash"));
+        $this->assertEquals("file.png", $converter->removeQueryParams("file.png?query=param"));
     }
 
     /**

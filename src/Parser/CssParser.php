@@ -77,7 +77,7 @@ class CssParser
     {
         foreach ($assetUrls as $assetUrl) {
             $relativePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
-            $relativePath = $this->uriConverter->cleanRelativePath($relativePath);
+            $relativePath = $this->uriConverter->removeQueryParams($relativePath);
 
             if (substr_count($relativePath, "../") == 0) {
                 $relativePath = $this->uriConverter->prependParentDirectoryDoubleDots($relativePath, $depthLevel);

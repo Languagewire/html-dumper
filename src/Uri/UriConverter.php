@@ -50,12 +50,13 @@ class UriConverter
                 $prefix = sprintf("%s/", $host);
             }
 
-            $path = ltrim(parse_url($assetUri, PHP_URL_PATH) ?? '', '/');
+            $path = parse_url($assetUri, PHP_URL_PATH) ?? '';
+            $path = ltrim($path, '/');
 
             return $prefix . $path;
-        } else {
-            return ltrim($assetUri, '/');
         }
+
+        return ltrim($assetUri, '/');
     }
 
     /**
@@ -68,10 +69,10 @@ class UriConverter
     {
         if (filter_var($assetUri, FILTER_VALIDATE_URL) !== false) {
             return $assetUri;
-        } else {
-            $assetUri = str_replace("../", "", $assetUri);
-            return $this->joinUrlWithPath($baseDomain, $assetUri);
         }
+
+        $assetUri = str_replace("../", "", $assetUri);
+        return $this->joinUrlWithPath($baseDomain, $assetUri);
     }
 
     /**
@@ -79,7 +80,7 @@ class UriConverter
      * @param string $relativePath
      * @return string
      */
-    public function cleanRelativePath(string $relativePath): string
+    public function removeQueryParams(string $relativePath): string
     {
         $relativePath = explode("#", $relativePath)[0];
         $relativePath = explode("?", $relativePath)[0];

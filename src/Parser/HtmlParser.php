@@ -231,7 +231,7 @@ class HtmlParser
     ): string {
         $originalAttributeValue = $element->getAttribute($attributeName);
         $relativePath = $this->uriConverter->convertUriToOfflinePath($originalAttributeValue, $baseDomain);
-        $relativePath = $this->uriConverter->cleanRelativePath($relativePath);
+        $relativePath = $this->uriConverter->removeQueryParams($relativePath);
         $element->setAttribute($attributeName, $relativePath);
 
         return $originalAttributeValue;

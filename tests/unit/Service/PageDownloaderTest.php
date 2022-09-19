@@ -59,7 +59,7 @@ class PageDownloaderTest extends TestCase
         $this->uriConverter = $this->prophesize(UriConverter::class);
 
         $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn('https://example.com');
-        $this->uriConverter->cleanRelativePath(Argument::type('string'))->willReturnArgument(0);
+        $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
         $this->htmlParser = $this->prophesize(HtmlParser::class);
         $this->cssParser = $this->prophesize(CssParser::class);

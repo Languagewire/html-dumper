@@ -119,7 +119,7 @@ class PageDownloader
         string $targetBaseDirectory,
         string $relativeTargetPath
     ): string {
-        $relativeTargetPath = $this->uriConverter->cleanRelativePath($relativeTargetPath);
+        $relativeTargetPath = $this->uriConverter->removeQueryParams($relativeTargetPath);
         $targetPath = $this->uriConverter->joinPaths($targetBaseDirectory, $relativeTargetPath);
 
         $targetDirectory = dirname($targetPath);
