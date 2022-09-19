@@ -31,7 +31,8 @@ COPY ./tests ./tests
 
 COPY ./phpunit.xml ./
 COPY ./phpstan.neon ./
-COPY ./phpcs.xml ./
+COPY ./phpcs-psr12-strict.xml ./
+COPY ./phpcs-psr12-tests.xml ./
 
 RUN XDEBUG_MODE=coverage bin/phpunit \
     --coverage-html /publish/reports/coverage-html \
@@ -45,8 +46,8 @@ RUN if [ "$RUN_INTEGRATION_TESTS" -eq 1 ]; then \
 
 RUN bin/phpstan analyse -c phpstan.neon
 
-RUN bin/phpcs --standard=PSR12 src/
-RUN bin/phpcs --standard=phpcs.xml tests/
+RUN bin/phpcs --standard=phpcs-psr12-strict.xml src/
+RUN bin/phpcs --standard=phpcs-psr12-tests.xml tests/
 
 RUN rm -rf ./bin ./vendor ./build ./environment ./vsts .phpunit.result.cache composer.lock
 
