@@ -1,6 +1,6 @@
 LanguageWire HtmlDumper library
 =====================================
-![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-blue)
+![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)
 ![Tests passing](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Coverage 95.90%](https://img.shields.io/badge/coverage-95.90%25-brightgreen)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)

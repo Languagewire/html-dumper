@@ -1,4 +1,4 @@
 # Changelog
 
-## 0.6.0-dev (--/--/2022)
+## 1.0.0-dev (--/--/2022)
 - First release, implementation of PageDownloader

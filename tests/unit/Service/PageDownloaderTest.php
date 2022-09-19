@@ -97,7 +97,7 @@ class PageDownloaderTest extends TestCase
         $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
         $this->httpClientWillReturnBasicHtmlPage($baseDomain);
         $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsWillBeMade($expectedAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
         $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
 
         $pageDownloader = $this->pageDownloader();
@@ -128,7 +128,7 @@ class PageDownloaderTest extends TestCase
         $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
         $this->httpClientWillReturnBasicHtmlPage($baseDomain);
         $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsWillBeMade($expectedAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
         $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
 
         $expectedCssAssetPaths = [
@@ -140,7 +140,7 @@ class PageDownloaderTest extends TestCase
 
         $this->uriConverterWillHandleAssets($expectedCssAssetPaths, $targetDirectory, $baseDomain);
         $this->httpClientWillReturnAssets($expectedCssAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsWillBeMade($expectedCssAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedCssAssetPaths, $baseDomain);
         $this->cssParserReturnsResult($expectedCssAssetPaths, $baseDomain);
 
         $pageDownloader = $this->pageDownloader();
@@ -179,8 +179,8 @@ class PageDownloaderTest extends TestCase
 
         $this->httpClientWillReturnAssets($expectedValidAssetPaths, $targetDirectory, $baseDomain);
 
-        $this->httpRequestsForAssetsWillBeMade($expectedValidAssetPaths, $baseDomain);
-        $this->httpRequestsForAssetsWillNotBeMade($expectedInvalidAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedValidAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldNotBeMade($expectedInvalidAssetPaths, $baseDomain);
 
         $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
 
@@ -220,7 +220,7 @@ class PageDownloaderTest extends TestCase
         $this->httpClientWillReturnAssets($expectedExistingAssetPaths, $targetDirectory, $baseDomain);
         $this->httpClientWillNotReturnAssets($expectedNonExistingAssetPaths, $baseDomain);
 
-        $this->httpRequestsForAssetsWillBeMade($expectedAssetPaths, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
 
         $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
 
@@ -311,14 +311,14 @@ class PageDownloaderTest extends TestCase
         }
     }
 
-    private function httpRequestsForAssetsWillBeMade(array $expectedAssetPaths, string $baseDomain): void
+    private function httpRequestsForAssetsShouldBeMade(array $expectedAssetPaths, string $baseDomain): void
     {
         foreach ($expectedAssetPaths as $expectedAssetUrl) {
             $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->shouldBeCalled();
         }
     }
 
-    private function httpRequestsForAssetsWillNotBeMade(array $expectedAssetPaths, string $baseDomain): void
+    private function httpRequestsForAssetsShouldNotBeMade(array $expectedAssetPaths, string $baseDomain): void
     {
         foreach ($expectedAssetPaths as $expectedAssetUrl) {
             $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->shouldNotBeCalled();
