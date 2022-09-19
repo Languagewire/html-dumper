@@ -44,7 +44,7 @@ jobs:
         run: "bin/phpunit --testdox tests/unit/"
 
   static-analysis:
-    name: "PHPStan"
+    name: "Static analysis (phpstan, phpcs)"
     runs-on: "ubuntu-latest"
 
     strategy:
@@ -66,12 +66,7 @@ jobs:
           extensions: mbstring
           tools: composer:v2
 
-      - name: "Install lowest dependencies"
-        if: ${{ matrix.dependencies == 'lowest' }}
-        run: "composer update --prefer-lowest --no-interaction --no-progress"
-
       - name: "Install highest dependencies"
-        if: ${{ matrix.dependencies == 'highest' }}
         run: "composer update --no-interaction --no-progress"
 
       - name: "Run PHPStan"
