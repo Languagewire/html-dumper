@@ -26,6 +26,7 @@ trait TemporaryFileTestsTrait
             mkdir($baseTargetPath);
         }
     }
+
     protected function recursivelyDeleteDirectory(string $directoryPath): void
     {
         // Iterate over all files first and then directories
