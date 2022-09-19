@@ -49,7 +49,7 @@ trait TemporaryFileTestsTrait
         $deletedAll = $deletedAll && @rmdir($directoryPath);
 
         if (!$deletedAll) {
-            throw new \Exception("Could not delete tmp target directory");
+            throw new \Exception("Could not delete all files from temporary directory $directoryPath");
         }
     }
 }
