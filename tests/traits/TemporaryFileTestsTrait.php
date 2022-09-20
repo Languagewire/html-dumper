@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace traits\LanguageWire;
 
+use GuzzleHttp\Psr7\Stream;
+use Psr\Http\Message\StreamInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -54,5 +56,13 @@ trait TemporaryFileTestsTrait
         if (!$deletedAll) {
             throw new \Exception("Could not delete all files from temporary directory $directoryPath");
         }
+    }
+
+    protected function createStreamFromString(string $contents): Stream
+    {
+        $handle = fopen('php://memory', "rw+");
+        fwrite($handle, $contents);
+        fseek($handle, 0);
+        return new Stream($handle);
     }
 }
