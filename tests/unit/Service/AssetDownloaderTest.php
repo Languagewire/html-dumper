@@ -136,6 +136,46 @@ class AssetDownloaderTest extends TestCase
             ->shouldNotHaveBeenCalled();
     }
 
+    /**
+     * @test
+     */
+    public function downloadAssets__WHEN_some_assets_dont_have_extensions_THEN_they_are_ignored(): void
+    {
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = self::TEMP_TARGET_DIRECTORY;
+
+        $existingAssetPaths = [
+            '/data/img/screenshot1.png'
+        ];
+
+        $assetPathsWithoutExtension = [
+            '/data/img/screenshot2_no_extension',
+            '/data/img/screenshot3_no_extension'
+        ];
+
+        $this->uriConverterWillHandleAssets($existingAssetPaths, $targetDirectory, $baseDomain);
+        $this->uriConverterWillHandleAssets($assetPathsWithoutExtension, $targetDirectory, $baseDomain);
+
+        $this->httpRequestsForAssetsShouldBeMade($existingAssetPaths, $baseDomain);
+
+        $this->httpClientWillReturnAssets($existingAssetPaths, $baseDomain);
+
+        $pageDownloader = $this->assetDownloader();
+
+        $pageDownloader->downloadAssets(array_merge($existingAssetPaths, $assetPathsWithoutExtension), $targetDirectory, $baseDomain);
+
+        $this->filesystem
+            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)
+            ->shouldHaveBeenCalled();
+
+        $this->filesystem
+            ->createFile("$targetDirectory/data/img/screenshot2_no_extension", Argument::type(StreamInterface::class), true)
+            ->shouldNotHaveBeenCalled();
+        $this->filesystem
+            ->createFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type(StreamInterface::class), true)
+            ->shouldNotHaveBeenCalled();
+    }
+
     private function assetDownloader(): AssetDownloader
     {
         return new AssetDownloader(
@@ -144,13 +184,6 @@ class AssetDownloaderTest extends TestCase
             $this->uriConverter->reveal(),
             $this->cssParser->reveal()
         );
-    }
-
-    private function httpClientWillReturnBasicHtmlPage(string $baseDomain): void
-    {
-        $htmlBody = (new HtmlFileProvider())->getValidHtmlWithAssets();
-        $response = (new ResponseBuilder())->withBodyString($htmlBody)->build();
-        $this->httpClient->request('GET', $baseDomain)->willReturn($response);
     }
 
     private function httpClientWillThrowExceptionOnUrl(string $url): void
@@ -192,18 +225,6 @@ class AssetDownloaderTest extends TestCase
             $this->uriConverter->removeQueryParams($assetPath)->willReturn($assetPath);
             $this->uriConverter->joinPaths($targetDirectory, $assetPath)->willReturn($targetDirectory . $assetPath);
         }
-    }
-
-    /**
-     * @param array $expectedAssetPaths
-     * @param string $baseDomain
-     * @return void
-     */
-    private function htmlParserReturnsResult(array $expectedAssetPaths, string $baseDomain): void
-    {
-        $htmlBody = (new HtmlFileProvider())->getValidHtmlWithAssets();
-        $parseResult = new ParseResult($htmlBody, $expectedAssetPaths);
-        $this->htmlParser->parseHtmlContent(Argument::type("string"), $baseDomain)->willReturn($parseResult);
     }
 
     /**
