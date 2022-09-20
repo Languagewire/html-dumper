@@ -260,6 +260,23 @@ class PageDownloaderTest extends TestCase
     /**
      * @test
      */
+    public function downloadPage__WHEN_target_directory_cant_be_created_THEN_exception_is_thrown(): void
+    {
+        $this->expectException(\Exception::class);
+
+        $url = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory . '/sub/';
+
+        // In setUp() we create the parent of $targetDirectory.
+        // By not creating $this->tempTargetDirectory, mkdir() should fail
+
+        $pageDownloader = $this->pageDownloader();
+        $pageDownloader->download($url, $targetDirectory);
+    }
+
+    /**
+     * @test
+     */
     public function downloadPage__WHEN_client_returns_null_THEN_false_is_returned(): void
     {
         $url = self::BASE_DOMAIN;
