@@ -33,8 +33,12 @@ class Filesystem
     /**
      * @throws IOException
      */
-    public function createFile(string $path, StreamInterface $content): void
+    public function createFile(string $path, StreamInterface $content, bool $createParentDirectory = false): void
     {
+        if ($createParentDirectory) {
+            $this->createParentDirectory($path);
+        }
+
         $handle = @fopen($path, 'x');
 
         if ($handle === false) {
@@ -86,5 +90,17 @@ class Filesystem
         }
 
         return new Stream($handle);
+    }
+
+    /**
+     * @throws IOException
+     */
+    public function createParentDirectory(string $path)
+    {
+        $parentDirectory = dirname($path);
+
+        if (!\is_dir($parentDirectory)) {
+            $this->createDirectory($parentDirectory, true);
+        }
     }
 }

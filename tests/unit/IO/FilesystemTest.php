@@ -83,6 +83,23 @@ class FilesystemTest extends TestCase
     /**
      * @test
      */
+    public function createDirectory__WHEN_directory_already_exists_THEN_IOException_is_thrown()
+    {
+        $targetPath = $this->tempTargetDirectory . '/sub';
+
+
+        $this->expectException(IOException::class);
+
+        mkdir($targetPath);
+
+        $sut = $this->filesystem();
+
+        $sut->createDirectory($targetPath);
+    }
+
+    /**
+     * @test
+     */
     public function createDirectory__WHEN_directory_has_subfolders_and_isnt_recursive_THEN_IOException_is_thrown()
     {
         $targetPath = $this->tempTargetDirectory . '/sub/folders';
@@ -152,6 +169,20 @@ class FilesystemTest extends TestCase
         $sut = $this->filesystem();
 
         $sut->readFile($targetPathNonExisting);
+    }
+    /**
+     * @test
+     */
+    public function createParentDirectory__WHEN_file_parent_directory_can_be_created_THEN_it_is_created()
+    {
+        $targetPathParentDirectory = $this->tempTargetDirectory . '/sub';
+        $targetPath = $this->tempTargetDirectory . '/sub/index.html';
+
+        $sut = $this->filesystem();
+
+        $sut->createParentDirectory($targetPath);
+
+        $this->assertDirectoryExists($targetPathParentDirectory);
     }
 
     private function filesystem(): Filesystem
