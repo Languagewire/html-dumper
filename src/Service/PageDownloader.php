@@ -16,6 +16,7 @@ namespace LanguageWire\HtmlDumper\Service;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use LanguageWire\HtmlDumper\Http\NullableHttpClient;
+use LanguageWire\HtmlDumper\IO\Filesystem;
 use LanguageWire\HtmlDumper\Parser\CssParser;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
 use LanguageWire\HtmlDumper\Parser\ParseResult;
@@ -37,20 +38,27 @@ class PageDownloader
      */
     private $htmlParser;
     /**
-     * @var CssParser
+     * @var AssetDownloader|null
      */
-    private $cssParser;
+    private $assetDownloader;
+    /**
+     * @var Filesystem|null
+     */
+    private $filesystem;
 
     public function __construct(
         ClientInterface $httpClient = null,
+        Filesystem $filesystem = null,
         UriConverter $uriConverter = null,
         HtmlParser $htmlParser = null,
-        CssParser $cssParser = null
+        AssetDownloader $assetDownloader = null
     ) {
-        $this->httpClient = new NullableHttpClient($httpClient ?? new Client());
+        $standardHttpClient = $httpClient ?? new Client();
+        $this->httpClient = new NullableHttpClient($standardHttpClient);
+        $this->filesystem = $filesystem ?? new Filesystem();
         $this->uriConverter = $uriConverter ?? new UriConverter();
         $this->htmlParser = $htmlParser ?? new HtmlParser($this->uriConverter);
-        $this->cssParser = $cssParser ?? new CssParser($this->uriConverter);
+        $this->assetDownloader = $assetDownloader ?? new AssetDownloader();
     }
 
     /**
@@ -66,7 +74,6 @@ class PageDownloader
      */
     public function download(string $url, string $targetDirectory): bool
     {
-        $this->createTargetDirectory($targetDirectory);
         $baseDomain = $this->uriConverter->getBaseDomainFromUrl($url);
 
         $indexFileResponse = $this->httpClient->request("GET", $url);
@@ -76,134 +83,14 @@ class PageDownloader
         }
 
         $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
-        $storeResult = $this->storeContent($parseResult->getOutputCode(), $targetDirectory, '/index.html');
 
-        if ($storeResult == null) {
-            return false;
-        }
+        $indexHtmlPath = $this->uriConverter->joinPaths($targetDirectory, '/index.html');
 
-        $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
+        $this->filesystem->createParentDirectory($indexHtmlPath);
+        $this->filesystem->createFile($indexHtmlPath, $parseResult->getOutputCode());
+
+        $this->assetDownloader->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
 
         return true;
-    }
-
-    /**
-     * Store a given stream into a file
-     *
-     * @param StreamInterface $contentStream
-     * @param string $targetBaseDirectory
-     * @param string $relativeTargetPath
-     * @return string
-     */
-    private function storeContent(
-        StreamInterface $contentStream,
-        string $targetBaseDirectory,
-        string $relativeTargetPath
-    ): ?string {
-        $relativeTargetPath = $this->uriConverter->removeQueryParams($relativeTargetPath);
-        $targetPath = $this->uriConverter->joinPaths($targetBaseDirectory, $relativeTargetPath);
-
-        $targetDirectory = dirname($targetPath);
-        if (!\is_dir($targetDirectory)) {
-            $mkdirResult = @mkdir($targetDirectory, 0777, true);
-
-            if ($mkdirResult === false) {
-                return null;
-            }
-        }
-
-        $result = @file_put_contents($targetPath, (string) $contentStream);
-
-        if ($result === false) {
-            return null;
-        }
-
-        $contentStream->rewind();
-
-        return $targetPath;
-    }
-
-    /**
-     * Create a target directory, throw an exception if it already exists
-     *
-     * @param string $targetDirectory
-     * @return void
-     * @throws \Exception
-     */
-    private function createTargetDirectory(string $targetDirectory): void
-    {
-        if (\is_dir($targetDirectory)) {
-            throw new \InvalidArgumentException("Target directory $targetDirectory already exists");
-        }
-
-        $result = @mkdir($targetDirectory);
-
-        if ($result === false) {
-            throw new \Exception("Could not create target directory $targetDirectory");
-        }
-    }
-
-    /**
-     * Download all given assets, converting URIs to relative paths
-     * Also parse CSS, look for assets and call this method recursively
-     *
-     * @param string[] $assetUris
-     * @param string $targetDirectory
-     * @param string $baseDomain
-     * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    private function downloadAssets(array $assetUris, string $targetDirectory, string $baseDomain): void
-    {
-        foreach ($assetUris as $assetUri) {
-            $offlinePath = $this->uriConverter->convertUriToOfflinePath($assetUri, $baseDomain);
-            if (pathinfo($offlinePath, PATHINFO_EXTENSION) == null) {
-                // Nothing to download without an extension
-                continue;
-            }
-
-            $assetUrl = $this->uriConverter->convertUriToUrl($assetUri, $baseDomain);
-
-            $targetPath = $this->downloadAsset($assetUrl, $targetDirectory, $baseDomain);
-
-            if ($targetPath == null) {
-                continue;
-            }
-
-            if (pathinfo($targetPath, PATHINFO_EXTENSION) === 'css') {
-                $contents = file_get_contents($targetPath);
-
-                $depthLevel = $this->uriConverter->countDepthLevelOfPath($offlinePath);
-                $parseResult = $this->cssParser->parseCssContent($contents, $baseDomain, $depthLevel);
-
-                // Store updated CSS
-                file_put_contents($targetPath, $parseResult->getOutputCode());
-
-                // Recursively call `downloadAssets` with the assetPaths found within the css file
-                $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
-            }
-        }
-    }
-
-    /**
-     * Download an asset and store it
-     *
-     * @param string $assetUrl
-     * @param string $targetDirectory
-     * @param string $baseDomain
-     * @return string|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    private function downloadAsset(string $assetUrl, string $targetDirectory, string $baseDomain): ?string
-    {
-        $assetResponse = $this->httpClient->request("GET", $assetUrl);
-
-        if ($assetResponse == null) {
-            // Do nothing, leave the broken URL for now
-            return null;
-        }
-
-        $offlinePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
-        return $this->storeContent($assetResponse->getBody(), $targetDirectory, $offlinePath);
     }
 }

@@ -14,34 +14,35 @@ declare(strict_types=1);
 namespace unit\LanguageWire\Service;
 
 use builder\LanguageWire\ResponseBuilder;
-use data\LanguageWire\CssFileProvider;
 use data\LanguageWire\HtmlFileProvider;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ServerException;
-use LanguageWire\HtmlDumper\Parser\CssParser;
+use LanguageWire\HtmlDumper\IO\Filesystem;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
 use LanguageWire\HtmlDumper\Parser\ParseResult;
+use LanguageWire\HtmlDumper\Service\AssetDownloader;
 use LanguageWire\HtmlDumper\Service\PageDownloader;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Psr\Http\Client\RequestExceptionInterface;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 use traits\LanguageWire\TemporaryFileTestsTrait;
 
 class PageDownloaderTest extends TestCase
 {
     use \Prophecy\PhpUnit\ProphecyTrait;
-    use TemporaryFileTestsTrait;
 
-    private const TEMP_TARGET_DIRECTORY_NAME = "page-downloader-target";
+    private const TEMP_TARGET_DIRECTORY = "page-downloader-target";
     private const BASE_DOMAIN = "https://example.com";
 
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     private $httpClient;
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    private $filesystem;
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
@@ -53,32 +54,19 @@ class PageDownloaderTest extends TestCase
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
-    private $cssParser;
-    /**
-     * @var string
-     */
-    private $tempTargetDirectory;
+    private $assetDownloader;
 
     protected function setUp(): void
     {
         $this->httpClient = $this->prophesize(ClientInterface::class);
+        $this->filesystem = $this->prophesize(Filesystem::class);
 
         $this->uriConverter = $this->prophesize(UriConverter::class);
 
         $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn(self::BASE_DOMAIN);
-        $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
         $this->htmlParser = $this->prophesize(HtmlParser::class);
-        $this->cssParser = $this->prophesize(CssParser::class);
-
-        $this->tempTargetDirectory = $this->createTemporaryDirectory(self::TEMP_TARGET_DIRECTORY_NAME);
-    }
-
-    protected function tearDown(): void
-    {
-        if (is_dir($this->tempTargetDirectory)) {
-            $this->recursivelyDeleteDirectory($this->tempTargetDirectory);
-        }
+        $this->assetDownloader = $this->prophesize(AssetDownloader::class);
     }
 
     /**
@@ -87,17 +75,16 @@ class PageDownloaderTest extends TestCase
     public function downloadPage__WHEN_an_url_and_target_directory_are_provided_THEN_files_are_created(): void
     {
         $baseDomain = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
+        $targetDirectory = self::TEMP_TARGET_DIRECTORY;
 
         $expectedAssetPaths = [
             '/data/img/screenshot1.png',
             '/data/img/screenshot2.png'
         ];
 
-        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
+        $this->uriConverter->joinPaths($targetDirectory, '/index.html')->willReturn("$targetDirectory/index.html");
+
         $this->httpClientWillReturnBasicHtmlPage($baseDomain);
-        $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
         $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
 
         $pageDownloader = $this->pageDownloader();
@@ -105,227 +92,40 @@ class PageDownloaderTest extends TestCase
         $result = $pageDownloader->download($baseDomain, $targetDirectory);
 
         $this->assertTrue($result);
-        $this->assertDirectoryExists($targetDirectory);
-        $this->assertFileExists("$targetDirectory/index.html");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot1.png");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot2.png");
+
+        $this->filesystem->createParentDirectory("$targetDirectory/index.html")->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/index.html", Argument::type(StreamInterface::class))->shouldHaveBeenCalled();
+
+        $this->assetDownloader->downloadAssets($expectedAssetPaths, $targetDirectory, $baseDomain)->shouldHaveBeenCalled();
     }
 
     /**
      * @test
      */
-    public function downloadPage__WHEN_page_has_css_assets_THEN_assets_within_it_are_downloaded(): void
+    public function downloadPage__WHEN_base_url_cannot_be_reached_THEN_result_is_false(): void
     {
         $baseDomain = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
+        $targetDirectory = self::TEMP_TARGET_DIRECTORY;
 
-        $expectedAssetPaths = [
-            '/data/css/style.css',
-            '/data/img/screenshot1.png',
-            '/data/img/screenshot2.png'
-        ];
+        $this->uriConverter->getBaseDomainFromUrl($baseDomain)->willReturn($baseDomain);
 
-        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillReturnBasicHtmlPage($baseDomain);
-        $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
-        $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
-
-        $expectedCssAssetPaths = [
-            '/data/img/background.png'
-        ];
-
-        $this->uriConverter->countDepthLevelOfPath(Argument::type('string'))->willReturn(2);
-        $this->uriConverter->prependParentDirectoryDoubleDots('data/img/background.png', 2)->willReturn('../../data/img/background.png');
-
-        $this->uriConverterWillHandleAssets($expectedCssAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillReturnAssets($expectedCssAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsShouldBeMade($expectedCssAssetPaths, $baseDomain);
-        $this->cssParserReturnsResult($expectedCssAssetPaths, $baseDomain);
+        $this->httpClientWillThrowExceptionOnUrl($baseDomain);
 
         $pageDownloader = $this->pageDownloader();
 
         $result = $pageDownloader->download($baseDomain, $targetDirectory);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($targetDirectory);
-        $this->assertFileExists("$targetDirectory/index.html");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot1.png");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot2.png");
-        $this->assertFileExists("$targetDirectory/data/img/background.png");
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_some_assets_dont_have_file_extensions_THEN_those_files_are_not_created(): void
-    {
-        $baseDomain = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
-
-        $expectedValidAssetPaths = [
-            '/data/img/screenshot1.png',
-            '/data/img/screenshot2.png'
-        ];
-        $expectedInvalidAssetPaths = [
-            '/data/img/unknownextension',
-            '/',
-        ];
-
-        $expectedAssetPaths = array_merge($expectedValidAssetPaths, $expectedInvalidAssetPaths);
-
-        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillReturnBasicHtmlPage($baseDomain);
-
-        $this->httpClientWillReturnAssets($expectedValidAssetPaths, $targetDirectory, $baseDomain);
-
-        $this->httpRequestsForAssetsShouldBeMade($expectedValidAssetPaths, $baseDomain);
-        $this->httpRequestsForAssetsShouldNotBeMade($expectedInvalidAssetPaths, $baseDomain);
-
-        $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
-
-        $pageDownloader = $this->pageDownloader();
-
-        $result = $pageDownloader->download($baseDomain, $targetDirectory);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($targetDirectory);
-        $this->assertFileExists("$targetDirectory/index.html");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot1.png");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot2.png");
-        $this->assertFileDoesNotExist("$targetDirectory/data/img/unknownextension");
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_some_assets_throw_exceptions_THEN_those_files_are_not_created(): void
-    {
-        $baseDomain = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
-
-        $expectedExistingAssetPaths = [
-            '/data/img/screenshot1.png',
-            '/data/img/screenshot2.png'
-        ];
-        $expectedNonExistingAssetPaths = [
-            '/data/img/404.png'
-        ];
-
-        $expectedAssetPaths = array_merge($expectedExistingAssetPaths, $expectedNonExistingAssetPaths);
-
-        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillReturnBasicHtmlPage($baseDomain);
-
-        $this->httpClientWillReturnAssets($expectedExistingAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillNotReturnAssets($expectedNonExistingAssetPaths, $baseDomain);
-
-        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
-
-        $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
-
-        $pageDownloader = $this->pageDownloader();
-
-        $result = $pageDownloader->download($baseDomain, $targetDirectory);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($targetDirectory);
-        $this->assertFileExists("$targetDirectory/index.html");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot1.png");
-        $this->assertFileExists("$targetDirectory/data/img/screenshot2.png");
-        $this->assertFileDoesNotExist("$targetDirectory/data/img/404.png");
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_target_directory_exists_THEN_exception_is_thrown(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $url = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
-
-        // In setUp() we create the parent of $targetDirectory.
-        // Now we are manually creating $targetDirectory, which is normally created by PageDownloader.
-        // This will cause the `download()` method to throw an exception.
-        mkdir($targetDirectory);
-
-        $pageDownloader = $this->pageDownloader();
-        $pageDownloader->download($url, $targetDirectory);
-
-        rmdir($targetDirectory);
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_target_directory_cant_be_created_THEN_exception_is_thrown(): void
-    {
-        $this->expectException(\Exception::class);
-
-        $url = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory . '/sub/';
-
-        // In setUp() we create the parent of $targetDirectory.
-        // By not creating $this->tempTargetDirectory, mkdir() should fail
-
-        $pageDownloader = $this->pageDownloader();
-        $pageDownloader->download($url, $targetDirectory);
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_client_throws_an_exception_on_index_url_THEN_false_is_returned(): void
-    {
-        $url = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
-
-        $this->httpClientWillThrowExceptionOnUrl($url);
-        $pageDownloader = $this->pageDownloader();
-        $result = $pageDownloader->download($url, $targetDirectory);
 
         $this->assertFalse($result);
-    }
-
-    /**
-     * @test
-     */
-    public function downloadPage__WHEN_an_asset_url_is_too_long_THEN_it_is_not_stored(): void
-    {
-        $baseDomain = self::BASE_DOMAIN;
-        $targetDirectory = $this->tempTargetDirectory;
-
-        $longAssetPath = '/data/img/screenshot1' . str_repeat("a", 4080) . '.png';
-
-        $expectedAssetPaths = [
-            $longAssetPath
-        ];
-
-        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpClientWillReturnBasicHtmlPage($baseDomain);
-        $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
-        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
-        $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
-
-        $pageDownloader = $this->pageDownloader();
-
-        $result = $pageDownloader->download($baseDomain, $targetDirectory);
-
-        $this->assertTrue($result);
-        $this->assertDirectoryExists($targetDirectory);
-        $this->assertFileExists("$targetDirectory/index.html");
-        $this->assertFileDoesNotExist($targetDirectory . $longAssetPath);
     }
 
     private function pageDownloader(): PageDownloader
     {
         return new PageDownloader(
             $this->httpClient->reveal(),
+            $this->filesystem->reveal(),
             $this->uriConverter->reveal(),
             $this->htmlParser->reveal(),
-            $this->cssParser->reveal()
+            $this->assetDownloader->reveal()
         );
     }
 
@@ -342,47 +142,6 @@ class PageDownloaderTest extends TestCase
         $this->httpClient->request('GET', $url)->willThrow($exception);
     }
 
-    private function httpClientWillReturnAssets(array $expectedAssetPaths, string $targetDirectory, string $baseDomain): void
-    {
-        $this->uriConverter->joinPaths($targetDirectory, '/index.html')->willReturn($targetDirectory . '/index.html');
-
-        foreach ($expectedAssetPaths as $expectedAssetUrl) {
-            $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->willReturn((new ResponseBuilder())->build());
-        }
-    }
-
-    private function httpClientWillNotReturnAssets(array $expectedAssetPaths, string $baseDomain): void
-    {
-        foreach ($expectedAssetPaths as $expectedAssetUrl) {
-            $this->httpClientWillThrowExceptionOnUrl($baseDomain . $expectedAssetUrl);
-        }
-    }
-
-    private function httpRequestsForAssetsShouldBeMade(array $expectedAssetPaths, string $baseDomain): void
-    {
-        foreach ($expectedAssetPaths as $expectedAssetUrl) {
-            $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->shouldBeCalled();
-        }
-    }
-
-    private function httpRequestsForAssetsShouldNotBeMade(array $expectedAssetPaths, string $baseDomain): void
-    {
-        foreach ($expectedAssetPaths as $expectedAssetUrl) {
-            $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->shouldNotBeCalled();
-        }
-    }
-
-    private function uriConverterWillHandleAssets(array $expectedAssetPaths, string $targetDirectory, string $baseDomain): void
-    {
-        foreach ($expectedAssetPaths as $expectedAssetPath) {
-            $this->uriConverter->joinPaths($targetDirectory, $expectedAssetPath)->willReturn($targetDirectory . $expectedAssetPath);
-            $this->uriConverter->joinUrlWithPath($baseDomain, $expectedAssetPath)->willReturn($baseDomain . $expectedAssetPath);
-            $this->uriConverter->convertUriToOfflinePath($expectedAssetPath, $baseDomain)->willReturn($expectedAssetPath);
-            $this->uriConverter->convertUriToOfflinePath($baseDomain . $expectedAssetPath, $baseDomain)->willReturn($expectedAssetPath);
-            $this->uriConverter->convertUriToUrl($expectedAssetPath, $baseDomain)->willReturn($baseDomain . $expectedAssetPath);
-        }
-    }
-
     /**
      * @param array $expectedAssetPaths
      * @param string $baseDomain
@@ -393,17 +152,5 @@ class PageDownloaderTest extends TestCase
         $htmlBody = (new HtmlFileProvider())->getValidHtmlWithAssets();
         $parseResult = new ParseResult($htmlBody, $expectedAssetPaths);
         $this->htmlParser->parseHtmlContent(Argument::type("string"), $baseDomain)->willReturn($parseResult);
-    }
-
-    /**
-     * @param array $expectedAssetPaths
-     * @param string $baseDomain
-     * @return void
-     */
-    private function cssParserReturnsResult(array $expectedAssetPaths, string $baseDomain): void
-    {
-        $cssBody = (new CssFileProvider())->getValidCssWithAssets();
-        $parseResult = new ParseResult($cssBody, $expectedAssetPaths);
-        $this->cssParser->parseCssContent(Argument::type("string"), $baseDomain, 2)->willReturn($parseResult);
     }
 }

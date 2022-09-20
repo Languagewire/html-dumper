@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace traits\LanguageWire;
 
 use GuzzleHttp\Psr7\Stream;
-use Psr\Http\Message\StreamInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
