@@ -29,17 +29,17 @@ class CssParser
 
     /**
      * @param string $cssContent
+     * @param string $cssDirectoryPath
      * @param string $baseDomain
-     * @param int $depthLevel
      * @return ParseResult
      */
-    public function parseCssContent(string $cssContent, string $baseDomain, int $depthLevel = 0): ParseResult
+    public function parseCssContent(string $cssContent, string $cssDirectoryPath, string $baseDomain): ParseResult
     {
         $assetUrls = $this->getUris($cssContent);
-        $outputCss = $this->updateCss($cssContent, $assetUrls, $baseDomain, $depthLevel);
-        $sanitizedAssetUrls = array_map('urldecode', $assetUrls);
+        $offlinePaths = $this->assetUrlsToOfflinePaths($assetUrls, $cssDirectoryPath, $baseDomain);
+        $outputCss = $this->updateCss($cssContent, $offlinePaths);
 
-        return new ParseResult($outputCss, $sanitizedAssetUrls);
+        return new ParseResult($outputCss, $assetUrls);
     }
 
     /**
@@ -69,25 +69,39 @@ class CssParser
     /**
      * @param string $cssContent
      * @param string[] $assetUrls
+     * @param string $cssDirectoryPath
      * @param string $baseDomain
-     * @param int $depthLevel
      * @return string
      */
-    private function updateCss(string $cssContent, array $assetUrls, string $baseDomain, int $depthLevel): string
+    private function updateCss(string $cssContent, array $assetUrls): string
     {
-        foreach ($assetUrls as $assetUrl) {
-            $relativePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
-            $relativePath = $this->uriConverter->removeQueryParams($relativePath);
-
-            if (substr_count($relativePath, "../") == 0) {
-                $relativePath = $this->uriConverter->prependParentDirectoryDoubleDots($relativePath, $depthLevel);
-            }
-
+        foreach ($assetUrls as $assetUrl => $absoluteOfflinePath) {
             $re = '/url\s*\(\s*[\'"]?' . preg_quote($assetUrl, '/') . '[\'"]?\s*\)/im';
 
-            $cssContent = preg_replace($re, sprintf("url('%s')", $relativePath), $cssContent);
+            $cssContent = preg_replace($re, sprintf("url('%s')", $absoluteOfflinePath), $cssContent);
         }
 
         return $cssContent;
+    }
+
+    /**
+     * @param string[] $assetUrls
+     * @param string $cssDirectoryPath
+     * @param string $baseDomain
+     * @return string[]
+     */
+    private function assetUrlsToOfflinePaths(array $assetUrls, string $cssDirectoryPath, string $baseDomain): array
+    {
+        $result = [];
+
+        foreach ($assetUrls as $assetUrl) {
+            $relativeOfflinePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
+            $relativeOfflinePath = $this->uriConverter->removeQueryParams($relativeOfflinePath);
+            $absoluteOfflinePath = $this->uriConverter->joinPaths($cssDirectoryPath, $relativeOfflinePath);
+
+            $result[$assetUrl] = $absoluteOfflinePath;
+        }
+
+        return $result;
     }
 }

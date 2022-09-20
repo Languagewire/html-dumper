@@ -24,6 +24,7 @@ class CssParserTest extends TestCase
     use \Prophecy\PhpUnit\ProphecyTrait;
 
     private const BASE_DOMAIN = 'http://example.com';
+    public const CSS_DIRECTORY_PATH = '/tmp/target/css/';
 
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
@@ -38,59 +39,118 @@ class CssParserTest extends TestCase
 
     /**
      * @test
-     * @dataProvider provideCssFiles
      */
-    public function parseCssContent__WHEN_valid_css_is_provided_THEN_expected_results_are_returned(string $cssContent, array $expectedAssetUrls): void
+    public function parseCssContent__WHEN_valid_css_is_provided_with_relative_paths_THEN_output_css_is_converted(): void
     {
-        $this->uriConverter->convertUriToOfflinePath(Argument::type('string'), self::BASE_DOMAIN)->willReturnArgument(0);
-        $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
+        $cssContent = <<<EOF
+.class {
+    background: url('img/background.png');
+}
+EOF;
+        $expectedCssContent = <<<EOF
+.class {
+    background: url('/tmp/target/css/img/background.png');
+}
+EOF;
+        $baseDomain = self::BASE_DOMAIN;
+        $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
+
+        $this->uriConverter->convertUriToOfflinePath('img/background.png', $baseDomain)->willReturn('img/background.png');
+        $this->uriConverter->removeQueryParams('img/background.png')->willReturn('img/background.png');
+        $this->uriConverter->joinPaths($cssDirectoryPath, 'img/background.png')->willReturn($cssDirectoryPath . 'img/background.png');
 
         $parser = $this->parser();
-        $assetUrls = $parser->parseCssContent($cssContent, self::BASE_DOMAIN)->getAssetUris();
-        $this->assertEqualsCanonicalizing($expectedAssetUrls, $assetUrls);
+
+        $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
+
+        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
     }
 
     /**
      * @test
      */
-    public function parseCssContent__WHEN_valid_css_is_provided_with_different_uri_schemes_THEN_output_css_is_converted(): void
+    public function parseCssContent__WHEN_valid_css_is_provided_with_absolute_base_urls_THEN_output_css_is_converted(): void
     {
-        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png', self::BASE_DOMAIN)->willReturn('data/img/relative.png');
-        $this->uriConverter->convertUriToOfflinePath('data/img/relative.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/relative.png?query=param');
-        $this->uriConverter->removeQueryParams('data/img/relative.png')->willReturn('data/img/relative.png');
-        $this->uriConverter->removeQueryParams('data/img/relative.png?query=param')->willReturn('data/img/relative.png');
+        $cssContent = <<<EOF
+.class {
+    background: url('http://example.com/img/background.png');
+}
+EOF;
+        $expectedCssContent = <<<EOF
+.class {
+    background: url('/tmp/target/css/img/background.png');
+}
+EOF;
+        $baseDomain = self::BASE_DOMAIN;
+        $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
 
-        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png', self::BASE_DOMAIN)->willReturn('data/img/absolute.png');
-        $this->uriConverter->convertUriToOfflinePath('/data/img/absolute.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/absolute.png?query=param');
-        $this->uriConverter->removeQueryParams('data/img/absolute.png')->willReturn('data/img/absolute.png');
-        $this->uriConverter->removeQueryParams('data/img/absolute.png?query=param')->willReturn('data/img/absolute.png');
-
-        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png', self::BASE_DOMAIN)->willReturn('data/img/baseDomain.png');
-        $this->uriConverter->convertUriToOfflinePath('http://example.com/data/img/baseDomain.png?query=param', self::BASE_DOMAIN)->willReturn('data/img/baseDomain.png?query=param');
-        $this->uriConverter->removeQueryParams('data/img/baseDomain.png')->willReturn('data/img/baseDomain.png');
-        $this->uriConverter->removeQueryParams('data/img/baseDomain.png?query=param')->willReturn('data/img/baseDomain.png');
-
-        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png', self::BASE_DOMAIN)->willReturn('externalcontent.com/data/img/externalDomain.png');
-        $this->uriConverter->convertUriToOfflinePath('http://externalcontent.com/data/img/externalDomain.png?query=param', self::BASE_DOMAIN)->willReturn('externalcontent.com/data/img/externalDomain.png?query=param');
-        $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png')->willReturn('externalcontent.com/data/img/externalDomain.png');
-        $this->uriConverter->removeQueryParams('externalcontent.com/data/img/externalDomain.png?query=param')->willReturn('externalcontent.com/data/img/externalDomain.png');
+        $this->uriConverter->convertUriToOfflinePath('http://example.com/img/background.png', $baseDomain)->willReturn('img/background.png');
+        $this->uriConverter->removeQueryParams('img/background.png')->willReturn('img/background.png');
+        $this->uriConverter->joinPaths($cssDirectoryPath, 'img/background.png')->willReturn($cssDirectoryPath . 'img/background.png');
 
         $parser = $this->parser();
 
-        $beforeCssContent = (new CssFileProvider())->getTestCssFilesUriTransformBefore();
-        $expectedOutputCss = (new CssFileProvider())->getTestCssFilesUriTransformAfter();
+        $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
-        $outputCss = $parser->parseCssContent($beforeCssContent, self::BASE_DOMAIN)->getOutputCode();
-
-        $this->assertEquals(
-            $expectedOutputCss,
-            (string)$outputCss
-        );
+        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
     }
 
-    public function provideCssFiles(): array
+    /**
+     * @test
+     */
+    public function parseCssContent__WHEN_valid_css_is_provided_with_absolute_external_urls_THEN_output_css_is_converted(): void
     {
-        return (new CssFileProvider())->getTestCssFiles();
+        $cssContent = <<<EOF
+.class {
+    background: url('http://externaldomain.com/img/background.png');
+}
+EOF;
+        $expectedCssContent = <<<EOF
+.class {
+    background: url('/tmp/target/css/externaldomain.com/img/background.png');
+}
+EOF;
+        $baseDomain = self::BASE_DOMAIN;
+        $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
+
+        $this->uriConverter->convertUriToOfflinePath('http://externaldomain.com/img/background.png', $baseDomain)->willReturn('externaldomain.com/img/background.png');
+        $this->uriConverter->removeQueryParams('externaldomain.com/img/background.png')->willReturn('externaldomain.com/img/background.png');
+        $this->uriConverter->joinPaths($cssDirectoryPath, 'externaldomain.com/img/background.png')->willReturn($cssDirectoryPath . 'externaldomain.com/img/background.png');
+
+        $parser = $this->parser();
+
+        $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
+
+        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
+    }
+
+    /**
+     * @test
+     */
+    public function parseCssContent__WHEN_valid_css_is_provided_with_directory_transversal_THEN_output_css_is_converted(): void
+    {
+        $cssContent = <<<EOF
+.class {
+    background: url('../img/background.png');
+}
+EOF;
+        $expectedCssContent = <<<EOF
+.class {
+    background: url('/tmp/target/css/../img/background.png');
+}
+EOF;
+        $baseDomain = self::BASE_DOMAIN;
+        $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
+
+        $this->uriConverter->convertUriToOfflinePath('../img/background.png', $baseDomain)->willReturn('../img/background.png');
+        $this->uriConverter->removeQueryParams('../img/background.png')->willReturn('../img/background.png');
+        $this->uriConverter->joinPaths($cssDirectoryPath, '../img/background.png')->willReturn($cssDirectoryPath . '../img/background.png');
+
+        $parser = $this->parser();
+
+        $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
+
+        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
     }
 
     private function parser(): CssParser
