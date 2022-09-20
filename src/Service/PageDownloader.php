@@ -99,11 +99,15 @@ class PageDownloader
             return null;
         }
 
-        $result = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
+        $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
 
-        $this->storeContent($result->getOutputCode(), $targetBaseDirectory, '/index.html');
+        $storeResult = $this->storeContent($parseResult->getOutputCode(), $targetBaseDirectory, '/index.html');
 
-        return $result;
+        if ($storeResult == null) {
+            return null;
+        }
+
+        return $parseResult;
     }
 
     /**
@@ -118,16 +122,25 @@ class PageDownloader
         StreamInterface $contentStream,
         string $targetBaseDirectory,
         string $relativeTargetPath
-    ): string {
+    ): ?string {
         $relativeTargetPath = $this->uriConverter->removeQueryParams($relativeTargetPath);
         $targetPath = $this->uriConverter->joinPaths($targetBaseDirectory, $relativeTargetPath);
 
         $targetDirectory = dirname($targetPath);
         if (!\is_dir($targetDirectory)) {
-            @mkdir($targetDirectory, 0777, true);
+            $mkdirResult = @mkdir($targetDirectory, 0777, true);
+
+            if ($mkdirResult === false) {
+                return null;
+            }
         }
 
-        file_put_contents($targetPath, $contentStream);
+        $result = @file_put_contents($targetPath, (string) $contentStream);
+
+        if ($result === false) {
+            return null;
+        }
+
         $contentStream->rewind();
 
         return $targetPath;

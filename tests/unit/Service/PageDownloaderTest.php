@@ -277,7 +277,7 @@ class PageDownloaderTest extends TestCase
     /**
      * @test
      */
-    public function downloadPage__WHEN_client_returns_null_THEN_false_is_returned(): void
+    public function downloadPage__WHEN_client_throws_an_exception_on_index_url_THEN_false_is_returned(): void
     {
         $url = self::BASE_DOMAIN;
         $targetDirectory = $this->tempTargetDirectory;
@@ -287,6 +287,36 @@ class PageDownloaderTest extends TestCase
         $result = $pageDownloader->download($url, $targetDirectory);
 
         $this->assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function downloadPage__WHEN_an_asset_url_is_too_long_THEN_it_is_not_stored(): void
+    {
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = $this->tempTargetDirectory;
+
+        $longAssetPath = '/data/img/screenshot1' . str_repeat("a", 4080) . '.png';
+
+        $expectedAssetPaths = [
+            $longAssetPath
+        ];
+
+        $this->uriConverterWillHandleAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
+        $this->httpClientWillReturnBasicHtmlPage($baseDomain);
+        $this->httpClientWillReturnAssets($expectedAssetPaths, $targetDirectory, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($expectedAssetPaths, $baseDomain);
+        $this->htmlParserReturnsResult($expectedAssetPaths, $baseDomain);
+
+        $pageDownloader = $this->pageDownloader();
+
+        $result = $pageDownloader->download($baseDomain, $targetDirectory);
+
+        $this->assertTrue($result);
+        $this->assertDirectoryExists($targetDirectory);
+        $this->assertFileExists("$targetDirectory/index.html");
+        $this->assertFileDoesNotExist($targetDirectory . $longAssetPath);
     }
 
     private function pageDownloader(): PageDownloader
