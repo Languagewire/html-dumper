@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace unit\LanguageWire\Service;
 
 use builder\LanguageWire\ResponseBuilder;
+use builder\LanguageWire\StreamBuilder;
 use data\LanguageWire\CssFileProvider;
 use data\LanguageWire\HtmlFileProvider;
 use GuzzleHttp\ClientInterface;
@@ -88,7 +89,7 @@ class AssetDownloaderTest extends TestCase
         $this->uriConverterWillHandleAssets($assetPaths, $targetDirectory, $baseDomain);
         $this->httpRequestsForAssetsShouldBeMade($assetPaths, $baseDomain);
 
-        $this->httpClientWillReturnAssets($assetPaths, $baseDomain);
+        $this->httpClientWillReturnEmptyContentAssets($assetPaths, $baseDomain);
 
         $pageDownloader = $this->assetDownloader();
 
@@ -120,7 +121,7 @@ class AssetDownloaderTest extends TestCase
         $this->httpRequestsForAssetsShouldBeMade($existingAssetPaths, $baseDomain);
         $this->httpRequestsForAssetsShouldBeMade($nonExistingAssetPaths, $baseDomain);
 
-        $this->httpClientWillReturnAssets($existingAssetPaths, $baseDomain);
+        $this->httpClientWillReturnEmptyContentAssets($existingAssetPaths, $baseDomain);
         $this->httpClientWillThrowExceptionOnAssets($nonExistingAssetPaths, $baseDomain);
 
         $pageDownloader = $this->assetDownloader();
@@ -158,7 +159,7 @@ class AssetDownloaderTest extends TestCase
 
         $this->httpRequestsForAssetsShouldBeMade($existingAssetPaths, $baseDomain);
 
-        $this->httpClientWillReturnAssets($existingAssetPaths, $baseDomain);
+        $this->httpClientWillReturnEmptyContentAssets($existingAssetPaths, $baseDomain);
 
         $pageDownloader = $this->assetDownloader();
 
@@ -174,6 +175,48 @@ class AssetDownloaderTest extends TestCase
         $this->filesystem
             ->createFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type(StreamInterface::class), true)
             ->shouldNotHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     */
+    public function downloadAssets__WHEN_assets_have_stylesheets_without_assets_THEN_no_extra_files_are_created(): void
+    {
+        $baseDomain = self::BASE_DOMAIN;
+        $targetDirectory = self::TEMP_TARGET_DIRECTORY;
+
+        $assetPaths = [
+            '/data/img/screenshot1.png',
+            '/data/img/screenshot2.png',
+            '/data/css/style.css',
+        ];
+
+        $this->uriConverterWillHandleAssets($assetPaths, $targetDirectory, $baseDomain);
+        $this->httpRequestsForAssetsShouldBeMade($assetPaths, $baseDomain);
+
+        $this->httpClientWillReturnEmptyContentAssets($assetPaths, $baseDomain);
+
+        $this->filesystem
+            ->readFile("$targetDirectory/data/css/style.css")
+            ->willReturn((new StreamBuilder())->withBodyString("")->build());
+
+        $this->uriConverter
+            ->countDepthLevelOfPath("/data/css/style.css")
+            ->willReturn(2);
+
+        $this->cssParser->parseCssContent("", $baseDomain, 2)->willReturn(
+            new ParseResult("", [])
+        );
+
+        $pageDownloader = $this->assetDownloader();
+
+        $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
+
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+
+        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class))->shouldHaveBeenCalled();
     }
 
     private function assetDownloader(): AssetDownloader
@@ -192,7 +235,7 @@ class AssetDownloaderTest extends TestCase
         $this->httpClient->request('GET', $url)->willThrow($exception);
     }
 
-    private function httpClientWillReturnAssets(array $expectedAssetPaths, string $baseDomain): void
+    private function httpClientWillReturnEmptyContentAssets(array $expectedAssetPaths, string $baseDomain): void
     {
         foreach ($expectedAssetPaths as $expectedAssetUrl) {
             $this->httpClient->request('GET', $baseDomain . $expectedAssetUrl)->willReturn((new ResponseBuilder())->build());

@@ -81,7 +81,8 @@ class AssetDownloader
             }
 
             if (pathinfo($assetTargetPath, PATHINFO_EXTENSION) === 'css') {
-                $this->downloadCssAssets($assetTargetPath, $offlinePath, $baseDomain, $targetDirectory);
+                $depthLevel = $this->uriConverter->countDepthLevelOfPath($offlinePath);
+                $this->downloadCssAssets($assetTargetPath, $depthLevel, $baseDomain, $targetDirectory);
             }
         }
     }
@@ -116,22 +117,22 @@ class AssetDownloader
     }
 
     /**
-     * @param string $assetTargetPath
-     * @param string $offlinePath
+     * @param string $cssFilePath
+     * @param int $depthLevel
      * @param string $baseDomain
      * @param string $targetDirectory
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \LanguageWire\HtmlDumper\IO\IOException
      */
-    private function downloadCssAssets(string $assetTargetPath, string $offlinePath, string $baseDomain, string $targetDirectory): void
+    private function downloadCssAssets(string $cssFilePath, int $depthLevel, string $baseDomain, string $targetDirectory): void
     {
-        $contents = file_get_contents($assetTargetPath);
+        $contents = (string) $this->filesystem->readFile($cssFilePath);
 
-        $depthLevel = $this->uriConverter->countDepthLevelOfPath($offlinePath);
         $parseResult = $this->cssParser->parseCssContent($contents, $baseDomain, $depthLevel);
 
         // Store updated CSS
-        file_put_contents($assetTargetPath, $parseResult->getOutputCode());
+        $this->filesystem->writeToFile($cssFilePath, $parseResult->getOutputCode());
 
         // Recursively call `downloadAssets` with the assetPaths found within the css file
         $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
