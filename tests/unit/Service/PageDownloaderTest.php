@@ -93,8 +93,7 @@ class PageDownloaderTest extends TestCase
 
         $this->assertTrue($result);
 
-        $this->filesystem->createParentDirectory("$targetDirectory/index.html")->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/index.html", Argument::type(StreamInterface::class))->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/index.html", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
 
         $this->assetDownloader->downloadAssets($expectedAssetPaths, $targetDirectory, $baseDomain)->shouldHaveBeenCalled();
     }
