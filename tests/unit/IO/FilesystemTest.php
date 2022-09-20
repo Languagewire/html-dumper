@@ -20,8 +20,9 @@ use traits\LanguageWire\TemporaryFileTestsTrait;
 
 class FilesystemTest extends TestCase
 {
-    private const TEMP_TARGET_DIRECTORY_NAME = "file-system-target";
     use TemporaryFileTestsTrait;
+
+    private const TEMP_TARGET_DIRECTORY_NAME = "file-system-target";
 
     private $tempTargetDirectory;
 

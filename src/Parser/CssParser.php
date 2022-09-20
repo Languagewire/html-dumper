@@ -69,8 +69,6 @@ class CssParser
     /**
      * @param string $cssContent
      * @param string[] $assetUrls
-     * @param string $cssDirectoryPath
-     * @param string $baseDomain
      * @return string
      */
     private function updateCss(string $cssContent, array $assetUrls): string

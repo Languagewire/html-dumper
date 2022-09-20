@@ -16,21 +16,15 @@ namespace unit\LanguageWire\Service;
 use builder\LanguageWire\ResponseBuilder;
 use builder\LanguageWire\StreamBuilder;
 use data\LanguageWire\CssFileProvider;
-use data\LanguageWire\HtmlFileProvider;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ServerException;
 use LanguageWire\HtmlDumper\IO\Filesystem;
 use LanguageWire\HtmlDumper\Parser\CssParser;
-use LanguageWire\HtmlDumper\Parser\HtmlParser;
 use LanguageWire\HtmlDumper\Parser\ParseResult;
 use LanguageWire\HtmlDumper\Service\AssetDownloader;
-use LanguageWire\HtmlDumper\Service\PageDownloader;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Psr\Http\Client\RequestExceptionInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use traits\LanguageWire\TemporaryFileTestsTrait;
 
@@ -69,7 +63,6 @@ class AssetDownloaderTest extends TestCase
         $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn(self::BASE_DOMAIN);
         $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
 
-        $this->htmlParser = $this->prophesize(HtmlParser::class);
         $this->cssParser = $this->prophesize(CssParser::class);
     }
 
@@ -325,17 +318,5 @@ class AssetDownloaderTest extends TestCase
             $this->uriConverter->removeQueryParams($assetPath)->willReturn($assetPath);
             $this->uriConverter->joinPaths($targetDirectory, $assetPath)->willReturn($targetDirectory . $assetPath);
         }
-    }
-
-    /**
-     * @param array $expectedAssetPaths
-     * @param string $baseDomain
-     * @return void
-     */
-    private function cssParserReturnsResult(array $expectedAssetPaths, string $baseDomain): void
-    {
-        $cssBody = (new CssFileProvider())->getValidCssWithAssets();
-        $parseResult = new ParseResult($cssBody, $expectedAssetPaths);
-        $this->cssParser->parseCssContent(Argument::type("string"), $baseDomain, 2)->willReturn($parseResult);
     }
 }
