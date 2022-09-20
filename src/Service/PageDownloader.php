@@ -61,53 +61,30 @@ class PageDownloader
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \LanguageWire\HtmlDumper\Parser\HtmlParsingException
+     * @throws \LanguageWire\HtmlDumper\Parser\HtmlGenerationException
+     * @throws \Exception
      */
     public function download(string $url, string $targetDirectory): bool
     {
         $this->createTargetDirectory($targetDirectory);
         $baseDomain = $this->uriConverter->getBaseDomainFromUrl($url);
 
-        $parseResult = $this->getProcessedIndexFile($url, $targetDirectory, $baseDomain);
+        $indexFileResponse = $this->httpClient->request("GET", $url);
 
-        if ($parseResult == null) {
+        if ($indexFileResponse == null) {
+            return false;
+        }
+
+        $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
+        $storeResult = $this->storeContent($parseResult->getOutputCode(), $targetDirectory, '/index.html');
+
+        if ($storeResult == null) {
             return false;
         }
 
         $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
 
         return true;
-    }
-
-    /**
-     * Download the requested URL, parse all assets and store it with all URIs changed to relative paths
-     *
-     * @param string $url
-     * @param string $targetBaseDirectory
-     * @param string $baseDomain
-     * @return ParseResult|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \LanguageWire\HtmlDumper\Parser\HtmlParsingException
-     */
-    private function getProcessedIndexFile(
-        string $url,
-        string $targetBaseDirectory,
-        string $baseDomain
-    ): ?ParseResult {
-        $indexFileResponse = $this->httpClient->request("GET", $url);
-
-        if ($indexFileResponse == null) {
-            return null;
-        }
-
-        $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
-
-        $storeResult = $this->storeContent($parseResult->getOutputCode(), $targetBaseDirectory, '/index.html');
-
-        if ($storeResult == null) {
-            return null;
-        }
-
-        return $parseResult;
     }
 
     /**
