@@ -170,6 +170,21 @@ class FilesystemTest extends TestCase
 
         $sut->readFile($targetPathNonExisting);
     }
+
+    /**
+     * @test
+     */
+    public function getParentDirectory__WHEN_a_file_is_provided_THEN_its_parent_is_returned()
+    {
+        $targetPath = $this->tempTargetDirectory . '/sub';
+
+        $this->expectException(IOException::class);
+
+        $sut = $this->filesystem();
+
+        $this->assertEquals($this->tempTargetDirectory, $sut->getParentDirectory($targetPath));
+    }
+
     /**
      * @test
      */

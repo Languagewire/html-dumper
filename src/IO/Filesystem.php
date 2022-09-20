@@ -92,12 +92,17 @@ class Filesystem
         return new Stream($handle);
     }
 
+    public function getParentDirectory(string $path): string
+    {
+        return dirname($path);
+    }
+
     /**
      * @throws IOException
      */
     public function createParentDirectory(string $path)
     {
-        $parentDirectory = dirname($path);
+        $parentDirectory = $this->getParentDirectory($path);
 
         if (!\is_dir($parentDirectory)) {
             $this->createDirectory($parentDirectory, true);
