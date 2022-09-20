@@ -178,8 +178,6 @@ class FilesystemTest extends TestCase
     {
         $targetPath = $this->tempTargetDirectory . '/sub';
 
-        $this->expectException(IOException::class);
-
         $sut = $this->filesystem();
 
         $this->assertEquals($this->tempTargetDirectory, $sut->getParentDirectory($targetPath));
