@@ -39,7 +39,7 @@ class Filesystem
             $this->createParentDirectory($path);
         }
 
-        $handle = @fopen($path, 'x');
+        $handle = @fopen($path, 'w');
 
         if ($handle === false) {
             throw IOException::createFile($path);
