@@ -55,7 +55,7 @@ class IntegrationTest extends TestCase
 
         $pageDownloader = $this->pageDownloader();
 
-        $pageDownloader->download($baseDomain, $targetDirectory);
+        $this->assertTrue($pageDownloader->download($baseDomain, $targetDirectory));
 
         $this->assertDirectoryExists($targetDirectory);
         $this->assertFileExists("$targetDirectory/index.html");
