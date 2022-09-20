@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace unit\LanguageWire\Parser;
 
-use data\LanguageWire\CssFileProvider;
 use LanguageWire\HtmlDumper\Parser\CssParser;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;

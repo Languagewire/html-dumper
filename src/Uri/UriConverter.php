@@ -136,7 +136,7 @@ class UriConverter
     }
 
     /**
-     * Joins an URL and a path together
+     * Joins a URL and a path together
      * @param string $url
      * @param string $path
      * @return string

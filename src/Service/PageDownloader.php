@@ -17,11 +17,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use LanguageWire\HtmlDumper\Http\NullableHttpClient;
 use LanguageWire\HtmlDumper\IO\Filesystem;
-use LanguageWire\HtmlDumper\Parser\CssParser;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
-use LanguageWire\HtmlDumper\Parser\ParseResult;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
-use Psr\Http\Message\StreamInterface;
 
 class PageDownloader
 {

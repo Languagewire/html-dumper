@@ -15,7 +15,6 @@ namespace unit\LanguageWire\Parser;
 
 use data\LanguageWire\HtmlFileProvider;
 use LanguageWire\HtmlDumper\Parser\HtmlParser;
-use LanguageWire\HtmlDumper\Parser\HtmlParsingException;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

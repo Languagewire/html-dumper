@@ -26,7 +26,6 @@ use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Http\Message\StreamInterface;
-use traits\LanguageWire\TemporaryFileTestsTrait;
 
 class PageDownloaderTest extends TestCase
 {

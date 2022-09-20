@@ -19,7 +19,6 @@ use LanguageWire\HtmlDumper\Http\NullableHttpClient;
 use LanguageWire\HtmlDumper\IO\Filesystem;
 use LanguageWire\HtmlDumper\Parser\CssParser;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
-use Psr\Http\Message\StreamInterface;
 
 class AssetDownloader
 {
@@ -61,6 +60,7 @@ class AssetDownloader
      * @param string $baseDomain
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \LanguageWire\HtmlDumper\IO\IOException
      */
     public function downloadAssets(array $assetUris, string $targetDirectory, string $baseDomain): void
     {

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace builder\LanguageWire;
 
 use GuzzleHttp\Psr7\Response;
-use Prophecy\Prophet;
 use Psr\Http\Message\ResponseInterface;
 
 final class ResponseBuilder
@@ -32,12 +31,6 @@ final class ResponseBuilder
     public function withBodyString(string $body): self
     {
         $this->body = $body;
-        return $this;
-    }
-
-    public function withStatusCode(int $statusCode): self
-    {
-        $this->statusCode = $statusCode;
         return $this;
     }
 
