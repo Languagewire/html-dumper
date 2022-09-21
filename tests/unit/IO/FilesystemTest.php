@@ -155,7 +155,7 @@ class FilesystemTest extends TestCase
 
         $result = $sut->readFile($targetPath);
 
-        $this->assertEquals("original content", $result->getContents());
+        $this->assertEquals("original content", $result);
     }
 
     /**

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace LanguageWire\HtmlDumper\IO;
 
-use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
 
 class Filesystem
@@ -81,15 +80,15 @@ class Filesystem
     /**
      * @throws IOException
      */
-    public function readFile(string $path): StreamInterface
+    public function readFile(string $path): string
     {
-        $handle = @fopen($path, 'r');
+        $contents = @file_get_contents($path);
 
-        if ($handle === false) {
+        if ($contents === false) {
             throw IOException::readFile($path);
         }
 
-        return new Stream($handle);
+        return $contents;
     }
 
     public function getParentDirectory(string $path): string

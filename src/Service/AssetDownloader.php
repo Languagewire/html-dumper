@@ -126,7 +126,7 @@ class AssetDownloader
     private function downloadCssAssets(string $cssFilePath, string $baseDomain, string $targetDirectory): void
     {
         $cssDirectoryPath = $this->filesystem->getParentDirectory($cssFilePath);
-        $cssContent = (string) $this->filesystem->readFile($cssFilePath);
+        $cssContent = $this->filesystem->readFile($cssFilePath);
 
         $parseResult = $this->cssParser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
