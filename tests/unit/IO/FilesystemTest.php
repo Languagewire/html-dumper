@@ -48,7 +48,7 @@ class FilesystemTest extends TestCase
 
         $sut = $this->filesystem();
 
-        $sut->createFile($targetPath, $this->createStreamFromString("content"));
+        $sut->createFile($targetPath, "content");
 
         $this->assertEquals("content", file_get_contents($targetPath));
     }
@@ -64,7 +64,7 @@ class FilesystemTest extends TestCase
 
         $sut = $this->filesystem();
 
-        $sut->createFile($targetPath, $this->createStreamFromString("content"));
+        $sut->createFile($targetPath, "content");
     }
 
     /**
@@ -123,7 +123,7 @@ class FilesystemTest extends TestCase
 
         $sut = $this->filesystem();
 
-        $sut->writeToFile($targetPath, $this->createStreamFromString("updated content"));
+        $sut->writeToFile($targetPath, "updated content");
 
         $this->assertEquals("updated content", file_get_contents($targetPath));
     }
@@ -139,13 +139,13 @@ class FilesystemTest extends TestCase
 
         $sut = $this->filesystem();
 
-        $sut->writeToFile($targetPath, $this->createStreamFromString("content"));
+        $sut->writeToFile($targetPath, "updated content");
     }
 
     /**
      * @test
      */
-    public function readFile__WHEN_file_can_be_read_THEN_stream_is_returned()
+    public function readFile__WHEN_file_can_be_read_THEN_string_is_returned()
     {
         $targetPath = $this->tempTargetDirectory . '/index.html';
 
@@ -161,7 +161,7 @@ class FilesystemTest extends TestCase
     /**
      * @test
      */
-    public function readFile__WHEN_file_cannot_be_read_THEN_stream_is_returned()
+    public function readFile__WHEN_file_cannot_be_read_THEN_string_is_returned()
     {
         $targetPathNonExisting = $this->tempTargetDirectory . '/index.html';
 

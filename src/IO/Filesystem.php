@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace LanguageWire\HtmlDumper\IO;
 
-use Psr\Http\Message\StreamInterface;
-
 class Filesystem
 {
     /**
@@ -32,7 +30,7 @@ class Filesystem
     /**
      * @throws IOException
      */
-    public function createFile(string $path, StreamInterface $content, bool $createParentDirectory = false): void
+    public function createFile(string $path, string $content, bool $createParentDirectory = false): void
     {
         if ($createParentDirectory) {
             $this->createParentDirectory($path);
@@ -44,7 +42,7 @@ class Filesystem
             throw IOException::createFile($path);
         }
 
-        $writeResult = @fwrite($handle, $content->getContents());
+        $writeResult = @fwrite($handle, $content);
 
         if ($writeResult === false) {
             throw IOException::createFile($path);
@@ -56,7 +54,7 @@ class Filesystem
     /**
      * @throws IOException
      */
-    public function writeToFile(string $path, StreamInterface $content): void
+    public function writeToFile(string $path, string $content): void
     {
         if (file_exists($path) === false) {
             throw IOException::writeToFile($path);
@@ -68,7 +66,7 @@ class Filesystem
             throw IOException::writeToFile($path);
         }
 
-        $writeResult = @fwrite($handle, (string) $content);
+        $writeResult = @fwrite($handle, $content);
 
         if ($writeResult === false) {
             throw IOException::writeToFile($path);

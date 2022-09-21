@@ -110,7 +110,7 @@ class AssetDownloader
 
         $targetPath = $this->uriConverter->joinPaths($targetDirectory, $offlineRelativePath);
 
-        $this->filesystem->createFile($targetPath, $assetResponse->getBody(), true);
+        $this->filesystem->createFile($targetPath, (string) $assetResponse->getBody(), true);
 
         return $targetPath;
     }

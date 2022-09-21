@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace unit\LanguageWire\Service;
 
 use builder\LanguageWire\ResponseBuilder;
-use builder\LanguageWire\StreamBuilder;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ServerException;
 use LanguageWire\HtmlDumper\IO\Filesystem;
@@ -24,7 +23,6 @@ use LanguageWire\HtmlDumper\Service\AssetDownloader;
 use LanguageWire\HtmlDumper\Uri\UriConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Psr\Http\Message\StreamInterface;
 use traits\LanguageWire\TemporaryFileTestsTrait;
 
 class AssetDownloaderTest extends TestCase
@@ -87,8 +85,8 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
     }
 
     /**
@@ -121,11 +119,11 @@ class AssetDownloaderTest extends TestCase
         $pageDownloader->downloadAssets(array_merge($existingAssetPaths, $nonExistingAssetPaths), $targetDirectory, $baseDomain);
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)
+            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
             ->shouldHaveBeenCalled();
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type(StreamInterface::class), true)
+            ->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
     }
 
@@ -158,14 +156,14 @@ class AssetDownloaderTest extends TestCase
         $pageDownloader->downloadAssets(array_merge($existingAssetPaths, $assetPathsWithoutExtension), $targetDirectory, $baseDomain);
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)
+            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
             ->shouldHaveBeenCalled();
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot2_no_extension", Argument::type(StreamInterface::class), true)
+            ->createFile("$targetDirectory/data/img/screenshot2_no_extension", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type(StreamInterface::class), true)
+            ->createFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
     }
 
@@ -192,7 +190,7 @@ class AssetDownloaderTest extends TestCase
 
         $this->filesystem
             ->readFile("$targetDirectory/data/css/style.css")
-            ->willReturn((new StreamBuilder())->withBodyString("")->build());
+            ->willReturn("");
 
         $this->uriConverter
             ->countDepthLevelOfPath("/data/css/style.css")
@@ -206,11 +204,11 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
 
-        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class))->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"))->shouldHaveBeenCalled();
     }
 
     /**
@@ -245,7 +243,7 @@ class AssetDownloaderTest extends TestCase
 
         $this->filesystem
             ->readFile("$targetDirectory/data/css/style.css")
-            ->willReturn((new StreamBuilder())->withBodyString("")->build());
+            ->willReturn("");
 
         $this->uriConverter
             ->countDepthLevelOfPath("/data/css/style.css")
@@ -259,13 +257,13 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
 
-        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type(StreamInterface::class))->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/background.png", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/fonts/font.woff", Argument::type(StreamInterface::class), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"))->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/img/background.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->createFile("$targetDirectory/data/css/fonts/font.woff", Argument::type("string"), true)->shouldHaveBeenCalled();
     }
 
     private function assetDownloader(): AssetDownloader

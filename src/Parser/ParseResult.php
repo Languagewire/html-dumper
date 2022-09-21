@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace LanguageWire\HtmlDumper\Parser;
 
-use GuzzleHttp\Psr7\Stream;
-use Psr\Http\Message\StreamInterface;
-
 class ParseResult
 {
     /**
@@ -37,12 +34,9 @@ class ParseResult
         $this->assetUris = $assetUris;
     }
 
-    public function getOutputCode(): StreamInterface
+    public function getOutputCode(): string
     {
-        $handle = fopen('php://memory', "rw+");
-        fwrite($handle, $this->outputCode);
-        fseek($handle, 0);
-        return new Stream($handle);
+        return $this->outputCode;
     }
 
     /**
