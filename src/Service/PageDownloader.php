@@ -82,7 +82,7 @@ class PageDownloader
         $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
 
         $indexHtmlPath = $this->uriConverter->joinPaths($targetDirectory, '/index.html');
-        $this->filesystem->createFile($indexHtmlPath, $parseResult->getOutputCode(), true);
+        $this->filesystem->createFile($indexHtmlPath, $parseResult->getParsedCode(), true);
 
         $this->assetDownloader->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
 

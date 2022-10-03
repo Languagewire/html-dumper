@@ -62,7 +62,7 @@ EOF;
 
         $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
-        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
+        $this->assertEquals($expectedCssContent, (string) $result->getParsedCode());
     }
 
     /**
@@ -91,7 +91,7 @@ EOF;
 
         $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
-        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
+        $this->assertEquals($expectedCssContent, (string) $result->getParsedCode());
     }
 
     /**
@@ -120,7 +120,7 @@ EOF;
 
         $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
-        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
+        $this->assertEquals($expectedCssContent, (string) $result->getParsedCode());
     }
 
     /**
@@ -149,7 +149,7 @@ EOF;
 
         $result = $parser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
-        $this->assertEquals($expectedCssContent, (string) $result->getOutputCode());
+        $this->assertEquals($expectedCssContent, (string) $result->getParsedCode());
     }
 
     private function parser(): CssParser

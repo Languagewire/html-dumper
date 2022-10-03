@@ -81,7 +81,7 @@ class HtmlParserTest extends TestCase
         $before = (new HtmlFileProvider())->getTestHtmlFilesUriTransformBefore();
         $expectedOutputHtml = (new HtmlFileProvider())->getTestHtmlFilesUriTransformAfter();
 
-        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getOutputCode();
+        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getParsedCode();
 
         $this->assertEquals(
             $this->removeLineBreaks($expectedOutputHtml),
@@ -99,7 +99,7 @@ class HtmlParserTest extends TestCase
         $before = (new HtmlFileProvider())->getTestHtmlFilesAnchorBefore();
         $expectedOutputHtml = (new HtmlFileProvider())->getTestHtmlFilesAnchorAfter();
 
-        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getOutputCode();
+        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getParsedCode();
 
         $this->assertEquals(
             $this->removeLineBreaks($expectedOutputHtml),
@@ -120,7 +120,7 @@ class HtmlParserTest extends TestCase
         $before = (new HtmlFileProvider())->getTestHtmlFilesSrcSetsBefore();
         $expectedOutputHtml = (new HtmlFileProvider())->getTestHtmlFilesSrcSetsAfter();
 
-        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getOutputCode();
+        $outputHtml = $parser->parseHtmlContent($before, self::BASE_DOMAIN)->getParsedCode();
 
         $this->assertEquals(
             $this->removeLineBreaks($expectedOutputHtml),

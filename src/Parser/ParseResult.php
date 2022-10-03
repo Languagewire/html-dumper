@@ -34,7 +34,7 @@ class ParseResult
         $this->assetUris = $assetUris;
     }
 
-    public function getOutputCode(): string
+    public function getParsedCode(): string
     {
         return $this->outputCode;
     }

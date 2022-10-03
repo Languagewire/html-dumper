@@ -131,7 +131,7 @@ class AssetDownloader
         $parseResult = $this->cssParser->parseCssContent($cssContent, $cssDirectoryPath, $baseDomain);
 
         // Store updated CSS
-        $this->filesystem->writeToFile($cssFilePath, $parseResult->getOutputCode());
+        $this->filesystem->writeToFile($cssFilePath, $parseResult->getParsedCode());
 
         // Recursively call `downloadAssets` with the assetPaths found within the css file
         $this->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
