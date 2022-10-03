@@ -60,6 +60,10 @@ class Filesystem
             throw IOException::writeToFile($path);
         }
 
+        if (!is_writable($path)) {
+            throw IOException::writeToFile($path);
+        }
+
         $handle = @fopen($path, 'w');
 
         if ($handle === false) {
