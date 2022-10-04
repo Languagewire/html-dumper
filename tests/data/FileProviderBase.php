@@ -15,7 +15,7 @@ namespace data\LanguageWire;
 
 use PHPUnit\TextUI\TestFileNotFoundException;
 
-class FileProviderBase
+abstract class FileProviderBase
 {
     protected function readFile(string $path): string
     {
