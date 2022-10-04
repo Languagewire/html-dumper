@@ -57,9 +57,6 @@ class AssetDownloaderTest extends TestCase
 
         $this->uriConverter = $this->prophesize(UriConverter::class);
 
-        $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturn(self::BASE_DOMAIN);
-        $this->uriConverter->removeQueryParams(Argument::type('string'))->willReturnArgument(0);
-
         $this->cssParser = $this->prophesize(CssParser::class);
     }
 
@@ -307,13 +304,13 @@ class AssetDownloaderTest extends TestCase
     {
         foreach ($assetPaths as $assetPath) {
             $assetUrl = $baseDomain . $assetPath;
-            $this->uriConverter->convertUriToOfflinePath($assetPath, $baseDomain)->willReturn($assetPath);
-            $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain)->willReturn($assetPath);
 
+            $this->uriConverter->convertUriToOfflinePath($assetPath, $baseDomain)->willReturn($assetPath);
             $this->uriConverter->convertUriToUrl($assetPath, $baseDomain)->willReturn($assetUrl);
 
-            $this->uriConverter->removeQueryParams($assetPath)->willReturn($assetPath);
-            $this->uriConverter->joinPaths($targetDirectory, $assetPath)->willReturn($targetDirectory . $assetPath);
+            $this->uriConverter
+                ->convertAssertUrlToLocalPath($assetUrl, $baseDomain, $targetDirectory)
+                ->willReturn($targetDirectory . $assetPath);
         }
     }
 }

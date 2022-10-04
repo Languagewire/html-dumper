@@ -105,10 +105,7 @@ class AssetDownloader
             return null;
         }
 
-        $offlineRelativePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
-        $offlineRelativePath = $this->uriConverter->removeQueryParams($offlineRelativePath);
-
-        $targetPath = $this->uriConverter->joinPaths($targetDirectory, $offlineRelativePath);
+        $targetPath = $this->uriConverter->convertAssertUrlToLocalPath($assetUrl, $baseDomain, $targetDirectory);
 
         $this->filesystem->createFile($targetPath, (string) $assetResponse->getBody(), true);
 
