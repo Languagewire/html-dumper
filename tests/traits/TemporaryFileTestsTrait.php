@@ -24,7 +24,7 @@ trait TemporaryFileTestsTrait
         $baseTargetPath = dirname($temporaryDirectoryNamePath);
 
         if (!is_dir($baseTargetPath)) {
-            mkdir($baseTargetPath);
+            mkdir($baseTargetPath, 0777, true);
         }
 
         return $temporaryDirectoryNamePath;
