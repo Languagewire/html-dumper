@@ -19,11 +19,16 @@ class HtmlParsingException extends \Exception
      * @var string
      */
     private $htmlContent;
+    /**
+     * @var string
+     */
+    private $url;
 
-    public function __construct(string $htmlContent)
+    public function __construct(string $htmlContent, string $url)
     {
-        parent::__construct("Could not load HTML content");
+        parent::__construct("Could not load HTML content from URL $url");
         $this->htmlContent = $htmlContent;
+        $this->url = $url;
     }
 
     /**
@@ -32,5 +37,13 @@ class HtmlParsingException extends \Exception
     public function getHtmlContent(): string
     {
         return $this->htmlContent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
     }
 }

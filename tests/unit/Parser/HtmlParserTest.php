@@ -33,6 +33,7 @@ class HtmlParserTest extends TestCase
     protected function setUp(): void
     {
         $this->uriConverter = $this->prophesize(UriConverter::class);
+        $this->uriConverter->getBaseDomainFromUrl(Argument::type('string'))->willReturnArgument(0);
     }
 
     /**

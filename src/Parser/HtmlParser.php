@@ -29,16 +29,18 @@ class HtmlParser
 
     /**
      * @param string $htmlContent
-     * @param string $baseDomain
+     * @param string $url
      * @return ParseResult
      * @throws HtmlParsingException
      * @throws HtmlGenerationException
      */
-    public function parseHtmlContent(string $htmlContent, string $baseDomain): ParseResult
+    public function parseHtmlContent(string $htmlContent, string $url): ParseResult
     {
+        $baseDomain = $this->uriConverter->getBaseDomainFromUrl($url);
+
         $document = new \DOMDocument();
         if (@$document->loadHTML($htmlContent) === false) {
-            throw new HtmlParsingException($htmlContent);
+            throw new HtmlParsingException($htmlContent, $url);
         }
 
         $xpath = new \DOMXPath($document);
@@ -58,7 +60,7 @@ class HtmlParser
         $outputHtml = $document->saveHTML();
 
         if ($outputHtml === false) {
-            throw new HtmlGenerationException();
+            throw new HtmlGenerationException($url);
         }
 
         $sanitizedAssetUrls = array_map('urldecode', $assetUrls);

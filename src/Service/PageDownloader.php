@@ -71,19 +71,18 @@ class PageDownloader
      */
     public function download(string $url, string $targetDirectory): bool
     {
-        $baseDomain = $this->uriConverter->getBaseDomainFromUrl($url);
-
         $indexFileResponse = $this->httpClient->request("GET", $url);
 
         if ($indexFileResponse == null) {
             return false;
         }
 
-        $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $baseDomain);
+        $parseResult = $this->htmlParser->parseHtmlContent((string) $indexFileResponse->getBody(), $url);
 
         $indexHtmlPath = $this->uriConverter->joinPaths($targetDirectory, '/index.html');
         $this->filesystem->writeToFile($indexHtmlPath, $parseResult->getParsedCode(), true);
 
+        $baseDomain = $this->uriConverter->getBaseDomainFromUrl($url);
         $this->assetDownloader->downloadAssets($parseResult->getAssetUris(), $targetDirectory, $baseDomain);
 
         return true;
