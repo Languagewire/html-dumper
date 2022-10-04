@@ -1,0 +1,36 @@
+{
+  "name": "languagewire/html-dumper",
+  "description": "A library which downloads pages as static HTML files and assets and dumps them on disk",
+  "type": "library",
+  "version": "0.0.0",
+  "require": {
+    "php": ">=7.2",
+    "ext-dom": "*",
+    "guzzlehttp/guzzle": "^7.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "phpunit/phpcov": "^8.2",
+    "phpstan/phpstan": "^1.8",
+    "monolog/monolog": "^2.8",
+    "squizlabs/php_codesniffer": "^4.0"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {"LanguageWire\\HtmlDumper\\": "src/"}
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "unit\\LanguageWire\\": "tests/unit",
+      "integration\\LanguageWire\\": "tests/integration",
+      "builder\\LanguageWire\\": "tests/builder",
+      "data\\LanguageWire\\": "tests/data",
+      "traits\\LanguageWire\\": "tests/traits"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
