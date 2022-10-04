@@ -15,8 +15,8 @@ namespace LanguageWire\HtmlDumper\Parser;
 
 class HtmlGenerationException extends \Exception
 {
-    public function __construct()
+    public function __construct(string $url)
     {
-        parent::__construct("Could not generate HTML content for the given DOMDocument");
+        parent::__construct("Could not generate updated HTML content for URL $url");
     }
 }
