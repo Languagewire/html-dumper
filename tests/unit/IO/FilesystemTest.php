@@ -88,7 +88,6 @@ class FilesystemTest extends TestCase
     {
         $targetPath = $this->tempTargetDirectory . '/sub';
 
-
         $this->expectException(IOException::class);
 
         mkdir($targetPath);
