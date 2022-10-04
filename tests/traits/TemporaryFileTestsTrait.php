@@ -21,10 +21,9 @@ trait TemporaryFileTestsTrait
     protected function createTemporaryDirectory(string $directoryName): string
     {
         $temporaryDirectoryNamePath = sys_get_temp_dir() . '/' . $directoryName;
-        $baseTargetPath = dirname($temporaryDirectoryNamePath);
 
-        if (!is_dir($baseTargetPath)) {
-            mkdir($baseTargetPath, 0777, true);
+        if (!is_dir($temporaryDirectoryNamePath)) {
+            mkdir($temporaryDirectoryNamePath, 0777, true);
         }
 
         return $temporaryDirectoryNamePath;

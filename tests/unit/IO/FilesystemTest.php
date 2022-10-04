@@ -29,7 +29,6 @@ class FilesystemTest extends TestCase
     protected function setUp(): void
     {
         $this->tempTargetDirectory = $this->createTemporaryDirectory(self::TEMP_TARGET_DIRECTORY_NAME);
-        mkdir($this->tempTargetDirectory);
     }
 
     protected function tearDown(): void
