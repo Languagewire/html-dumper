@@ -24,6 +24,7 @@ class UriConverter
 
         return $fullPath;
     }
+
     /**
      * Returns the scheme and domain part from a URL
      * @param string $url
