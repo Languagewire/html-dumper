@@ -91,7 +91,7 @@ class PageDownloaderTest extends TestCase
 
         $this->assertTrue($result);
 
-        $this->filesystem->createFile("$targetDirectory/index.html", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/index.html", Argument::type("string"), true)->shouldHaveBeenCalled();
 
         $this->assetDownloader->downloadAssets($expectedAssetPaths, $targetDirectory, $baseDomain)->shouldHaveBeenCalled();
     }

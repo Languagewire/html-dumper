@@ -42,34 +42,6 @@ class FilesystemTest extends TestCase
     /**
      * @test
      */
-    public function createFile__WHEN_file_can_be_created_THEN_it_is_created()
-    {
-        $targetPath = $this->tempTargetDirectory . '/index.html';
-
-        $sut = $this->filesystem();
-
-        $sut->createFile($targetPath, "content");
-
-        $this->assertEquals("content", file_get_contents($targetPath));
-    }
-
-    /**
-     * @test
-     */
-    public function createFile__WHEN_file_cannot_be_created_THEN_IOException_is_thrown()
-    {
-        $targetPath = $this->tempTargetDirectory . '/sub/index.html';
-
-        $this->expectException(IOException::class);
-
-        $sut = $this->filesystem();
-
-        $sut->createFile($targetPath, "content");
-    }
-
-    /**
-     * @test
-     */
     public function createDirectory__WHEN_directory_can_be_created_THEN_it_is_created()
     {
         $targetPath = $this->tempTargetDirectory . '/sub';
@@ -114,7 +86,7 @@ class FilesystemTest extends TestCase
     /**
      * @test
      */
-    public function writeToFile__WHEN_file_can_be_written_to_THEN_contents_are_updated()
+    public function writeToFile__WHEN_file_exists_and_can_be_written_to_THEN_contents_are_updated()
     {
         $targetPath = $this->tempTargetDirectory . '/index.html';
 
@@ -130,15 +102,30 @@ class FilesystemTest extends TestCase
     /**
      * @test
      */
-    public function writeToFile__WHEN_file_does_not_exist_THEN_IOException_is_thrown()
+    public function writeToFile__WHEN_file_does_not_exist_THEN_it_is_created()
     {
         $targetPath = $this->tempTargetDirectory . '/index.html';
-
-        $this->expectException(IOException::class);
 
         $sut = $this->filesystem();
 
         $sut->writeToFile($targetPath, "updated content");
+
+        $this->assertEquals("updated content", file_get_contents($targetPath));
+    }
+
+    /**
+     * @test
+     */
+    public function writeToFile__WHEN_file_and_path_do_not_exist_THEN_both_are_created()
+    {
+        $targetPath = $this->tempTargetDirectory . '/subfolder/index.html';
+
+        $sut = $this->filesystem();
+
+        $sut->writeToFile($targetPath, "updated content", true);
+
+        $this->assertTrue(is_dir($this->tempTargetDirectory . '/subfolder/'));
+        $this->assertEquals("updated content", file_get_contents($targetPath));
     }
 
     /**

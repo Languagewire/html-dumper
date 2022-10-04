@@ -30,34 +30,18 @@ class Filesystem
     /**
      * @throws IOException
      */
-    public function createFile(string $path, string $content, bool $createParentDirectory = false): void
+    public function writeToFile(string $path, string $content, bool $createParentDirectory = false): void
     {
         if ($createParentDirectory) {
             $this->createParentDirectory($path);
         }
 
-        $handle = @fopen($path, 'w');
-
-        if ($handle === false) {
-            throw IOException::createFile($path);
-        }
-
-        $writeResult = @fwrite($handle, $content);
-
-        if ($writeResult === false) {
-            throw IOException::createFile($path);
-        }
-
-        fclose($handle);
-    }
-
-    /**
-     * @throws IOException
-     */
-    public function writeToFile(string $path, string $content): void
-    {
         if (file_exists($path) === false) {
-            throw IOException::writeToFile($path);
+            $touchResult = @touch($path);
+
+            if ($touchResult === false) {
+                throw IOException::createFile($path);
+            }
         }
 
         if (!is_writable($path)) {

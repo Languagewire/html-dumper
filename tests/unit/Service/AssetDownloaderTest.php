@@ -82,8 +82,8 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
     }
 
     /**
@@ -116,11 +116,11 @@ class AssetDownloaderTest extends TestCase
         $pageDownloader->downloadAssets(array_merge($existingAssetPaths, $nonExistingAssetPaths), $targetDirectory, $baseDomain);
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
+            ->writeToFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
             ->shouldHaveBeenCalled();
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)
+            ->writeToFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
     }
 
@@ -153,14 +153,14 @@ class AssetDownloaderTest extends TestCase
         $pageDownloader->downloadAssets(array_merge($existingAssetPaths, $assetPathsWithoutExtension), $targetDirectory, $baseDomain);
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
+            ->writeToFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)
             ->shouldHaveBeenCalled();
 
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot2_no_extension", Argument::type("string"), true)
+            ->writeToFile("$targetDirectory/data/img/screenshot2_no_extension", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
         $this->filesystem
-            ->createFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type("string"), true)
+            ->writeToFile("$targetDirectory/data/img/screenshot3_no_extension", Argument::type("string"), true)
             ->shouldNotHaveBeenCalled();
     }
 
@@ -201,10 +201,10 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
 
+        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
         $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"))->shouldHaveBeenCalled();
     }
 
@@ -254,13 +254,14 @@ class AssetDownloaderTest extends TestCase
 
         $pageDownloader->downloadAssets($assetPaths, $targetDirectory, $baseDomain);
 
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot1.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/img/screenshot2.png", Argument::type("string"), true)->shouldHaveBeenCalled();
 
+        $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"), true)->shouldHaveBeenCalled();
         $this->filesystem->writeToFile("$targetDirectory/data/css/style.css", Argument::type("string"))->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/img/background.png", Argument::type("string"), true)->shouldHaveBeenCalled();
-        $this->filesystem->createFile("$targetDirectory/data/css/fonts/font.woff", Argument::type("string"), true)->shouldHaveBeenCalled();
+
+        $this->filesystem->writeToFile("$targetDirectory/data/img/background.png", Argument::type("string"), true)->shouldHaveBeenCalled();
+        $this->filesystem->writeToFile("$targetDirectory/data/css/fonts/font.woff", Argument::type("string"), true)->shouldHaveBeenCalled();
     }
 
     private function assetDownloader(): AssetDownloader

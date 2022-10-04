@@ -107,7 +107,7 @@ class AssetDownloader
 
         $targetPath = $this->uriConverter->convertAssertUrlToLocalPath($assetUrl, $baseDomain, $targetDirectory);
 
-        $this->filesystem->createFile($targetPath, (string) $assetResponse->getBody(), true);
+        $this->filesystem->writeToFile($targetPath, (string) $assetResponse->getBody(), true);
 
         return $targetPath;
     }
