@@ -15,11 +15,6 @@ namespace LanguageWire\HtmlDumper\IO;
 
 class IOException extends \Exception
 {
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
     public static function createDirectory(string $path): self
     {
         return new self("Could not create directory at $path");
