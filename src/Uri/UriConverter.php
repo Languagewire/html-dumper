@@ -15,6 +15,15 @@ namespace LanguageWire\HtmlDumper\Uri;
 
 class UriConverter
 {
+    public function convertAssertUrlToLocalPath(string $assetUri, string $baseDomain, string $baseDirectory): string
+    {
+        $offlinePath = $this->convertUriToOfflinePath($assetUri, $baseDomain);
+        $offlinePath = $this->removeQueryParams($offlinePath);
+
+        $fullPath = $this->joinPaths($baseDirectory, $offlinePath);
+
+        return $fullPath;
+    }
     /**
      * Returns the scheme and domain part from a URL
      * @param string $url
