@@ -93,9 +93,7 @@ class CssParser
         $result = [];
 
         foreach ($assetUrls as $assetUrl) {
-            $relativeOfflinePath = $this->uriConverter->convertUriToOfflinePath($assetUrl, $baseDomain);
-            $relativeOfflinePath = $this->uriConverter->removeQueryParams($relativeOfflinePath);
-            $absoluteOfflinePath = $this->uriConverter->joinPaths($cssDirectoryPath, $relativeOfflinePath);
+            $absoluteOfflinePath = $this->uriConverter->convertAssertUrlToLocalPath($assetUrl, $baseDomain, $cssDirectoryPath);
 
             $result[$assetUrl] = $absoluteOfflinePath;
         }

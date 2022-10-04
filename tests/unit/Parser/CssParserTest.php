@@ -54,9 +54,9 @@ EOF;
         $baseDomain = self::BASE_DOMAIN;
         $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
 
-        $this->uriConverter->convertUriToOfflinePath('img/background.png', $baseDomain)->willReturn('img/background.png');
-        $this->uriConverter->removeQueryParams('img/background.png')->willReturn('img/background.png');
-        $this->uriConverter->joinPaths($cssDirectoryPath, 'img/background.png')->willReturn($cssDirectoryPath . 'img/background.png');
+        $this->uriConverter
+            ->convertAssertUrlToLocalPath('img/background.png', $baseDomain, $cssDirectoryPath)
+            ->willReturn($cssDirectoryPath . 'img/background.png');
 
         $parser = $this->parser();
 
@@ -83,9 +83,9 @@ EOF;
         $baseDomain = self::BASE_DOMAIN;
         $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
 
-        $this->uriConverter->convertUriToOfflinePath('http://example.com/img/background.png', $baseDomain)->willReturn('img/background.png');
-        $this->uriConverter->removeQueryParams('img/background.png')->willReturn('img/background.png');
-        $this->uriConverter->joinPaths($cssDirectoryPath, 'img/background.png')->willReturn($cssDirectoryPath . 'img/background.png');
+        $this->uriConverter
+            ->convertAssertUrlToLocalPath('http://example.com/img/background.png', $baseDomain, $cssDirectoryPath)
+            ->willReturn($cssDirectoryPath . 'img/background.png');
 
         $parser = $this->parser();
 
@@ -112,9 +112,9 @@ EOF;
         $baseDomain = self::BASE_DOMAIN;
         $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
 
-        $this->uriConverter->convertUriToOfflinePath('http://externaldomain.com/img/background.png', $baseDomain)->willReturn('externaldomain.com/img/background.png');
-        $this->uriConverter->removeQueryParams('externaldomain.com/img/background.png')->willReturn('externaldomain.com/img/background.png');
-        $this->uriConverter->joinPaths($cssDirectoryPath, 'externaldomain.com/img/background.png')->willReturn($cssDirectoryPath . 'externaldomain.com/img/background.png');
+        $this->uriConverter
+            ->convertAssertUrlToLocalPath('http://externaldomain.com/img/background.png', $baseDomain, $cssDirectoryPath)
+            ->willReturn($cssDirectoryPath . 'externaldomain.com/img/background.png');
 
         $parser = $this->parser();
 
@@ -141,9 +141,9 @@ EOF;
         $baseDomain = self::BASE_DOMAIN;
         $cssDirectoryPath = self::CSS_DIRECTORY_PATH;
 
-        $this->uriConverter->convertUriToOfflinePath('../img/background.png', $baseDomain)->willReturn('../img/background.png');
-        $this->uriConverter->removeQueryParams('../img/background.png')->willReturn('../img/background.png');
-        $this->uriConverter->joinPaths($cssDirectoryPath, '../img/background.png')->willReturn($cssDirectoryPath . '../img/background.png');
+        $this->uriConverter
+            ->convertAssertUrlToLocalPath('../img/background.png', $baseDomain, $cssDirectoryPath)
+            ->willReturn($cssDirectoryPath . '../img/background.png');
 
         $parser = $this->parser();
 
