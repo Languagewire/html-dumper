@@ -12,7 +12,7 @@ HtmlDumper is a PHP library which downloads a copy of an HTML page and its asset
   - Stylesheets, scripts, images, videos
   - Also works with assets located within CSS files.
 - Removes anchor links to external pages.
-- Does not crawl beyond the initial URL.
+- Does not crawl pages beyond the initial URL.
 
 ```php
 $url = "https://example.com";
@@ -40,9 +40,21 @@ composer require languagewire/html-dumper
 
 ## Development
 
+In the `build/` folder there is a `Dockerfile` file which sets up all dependencies needed for local development,
+runs unit tests and other linters.
+
+Customize `build/.env` like this:
+
 ```bash
 cd build
 cp .env.template .env
+nano .env
+```
+
+And then run `./build.sh` within the `build/` folder:
+
+```bash
+cd build
 ./build.sh
 ```
 
