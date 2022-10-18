@@ -22,8 +22,6 @@ COPY --from=composer:2.4.1 /usr/bin/composer /usr/local/bin/composer
 COPY ./composer.json ./
 COPY ./composer.lock ./
 
-RUN sed -i "s/0.0.0/$LIBRARY_RELEASE_NAME/g" "composer.json"
-
 RUN composer install --no-interaction --no-cache -o
 
 COPY ./src ./src
