@@ -3,6 +3,9 @@
   "description": "A library which downloads pages as static HTML files and assets and dumps them on disk",
   "type": "library",
   "version": "0.0.0",
+  "license": [
+    "MIT"
+  ],
   "require": {
     "php": ">=7.2",
     "ext-dom": "*",
