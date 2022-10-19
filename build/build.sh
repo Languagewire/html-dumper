@@ -20,8 +20,6 @@ LINE_COVERAGE=$(grep "Lines" -m 1 coverage.txt | cut -d " " -f 6 | sed "s/%//")
 rm -f coverage.txt
 
 # Update README.md file
-VERSION_BADGE="![Version $LIBRARY_RELEASE_NAME](https://img.shields.io/badge/version-$LIBRARY_RELEASE_NAME-blue)"
-sed -i "/Version /c $VERSION_BADGE" ../README.md
 COVERAGE_BADGE="![Coverage $LINE_COVERAGE%](https://img.shields.io/badge/coverage-$LINE_COVERAGE%25-brightgreen)"
 sed -i "/Coverage /c $COVERAGE_BADGE" ../README.md
 
