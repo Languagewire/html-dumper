@@ -1,9 +1,9 @@
 LanguageWire HtmlDumper library
 =====================================
-![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-blue)
-![Tests passing](https://img.shields.io/badge/tests-passing-brightgreen)
+[![Packagist](https://img.shields.io/packagist/v/languagewire/html-dumper)](https://packagist.org/packages/languagewire/html-dumper)
+[![Build](https://github.com/Languagewire/html-dumper/actions/workflows/build.yml/badge.svg)](https://github.com/Languagewire/html-dumper/actions/workflows/build.yml)
 ![Coverage 96.34%](https://img.shields.io/badge/coverage-96.34%25-brightgreen)
-![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+[![license](https://img.shields.io/packagist/l/languagewire/html-dumper)](https://github.com/Languagewire/html-dumper/blob/main/LICENSE)
 
 HtmlDumper is a PHP library which downloads a copy of an HTML page and its assets into a target directory.
 
@@ -40,8 +40,7 @@ composer require languagewire/html-dumper
 
 ## Development
 
-In the `build/` folder there is a `Dockerfile` file which sets up all dependencies needed for local development,
-runs unit tests and other linters.
+In the `build/` folder there is a `Dockerfile` file which sets up all dependencies needed for local development, runs unit tests and other linters.
 
 Customize `build/.env` like this:
 
@@ -61,4 +60,3 @@ cd build
 ## License
 
 HtmlDumper is made available under the MIT License (MIT). Please see the [LICENSE](LICENSE) file for more information.
-
