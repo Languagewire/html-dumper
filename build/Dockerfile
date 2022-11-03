@@ -34,7 +34,6 @@ COPY ./phpcs-psr12-tests.xml ./
 
 RUN XDEBUG_MODE=coverage bin/phpunit \
     --coverage-html /publish/reports/coverage-html \
-    --coverage-text=/publish/reports/coverage.txt \
     --colors \
     --testdox tests/unit/
 
