@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace LanguageWire\HtmlDumper\Http;
 
 use GuzzleHttp\ClientInterface;
-use Psr\Http\Client\RequestExceptionInterface;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
 class NullableHttpClient
@@ -39,7 +39,7 @@ class NullableHttpClient
     {
         try {
             return $this->client->request($method, $assetUrl);
-        } catch (RequestExceptionInterface $e) {
+        } catch (RequestException $e) {
             return null;
         }
     }
