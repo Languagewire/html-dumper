@@ -2,7 +2,7 @@ LanguageWire HtmlDumper library
 =====================================
 [![Packagist](https://img.shields.io/packagist/v/languagewire/html-dumper)](https://packagist.org/packages/languagewire/html-dumper)
 [![Build](https://github.com/Languagewire/html-dumper/actions/workflows/build.yml/badge.svg)](https://github.com/Languagewire/html-dumper/actions/workflows/build.yml)
-![Coverage 96.34%](https://img.shields.io/badge/coverage-96.34%25-brightgreen)
+[![Coverage Status](https://coveralls.io/repos/github/Languagewire/html-dumper/badge.svg)](https://coveralls.io/github/Languagewire/html-dumper)
 [![license](https://img.shields.io/packagist/l/languagewire/html-dumper)](https://github.com/Languagewire/html-dumper/blob/main/LICENSE)
 
 HtmlDumper is a PHP library which downloads a copy of an HTML page and its assets into a target directory.
